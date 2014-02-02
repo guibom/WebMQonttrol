@@ -12,7 +12,7 @@ var mqttbroker = 'localhost';
 var mqttport = 1883;
 
 var io = socket.listen(3000);
-var mqttclient = mqtt.createClient(mqttport, mqttbroker, 'CubieWEB');
+var mqttclient = mqtt.createClient(mqttport, mqttbroker);
 
 // Reduce socket.io debug output
 io.set('log level', 0)
@@ -23,12 +23,12 @@ io.sockets.on('connection', function (socket) {
         mqttclient.subscribe(data.topic);
     });
 
-	socket.on('publish', function (data, data2) {
-        mqttclient.publish(data.topic, data.message);
+    socket.on('publish', function (data) {
+    	mqttclient.publish(data.topic, data.message);
     });
 
-	socket.on('disconnect', function (data, data2) {
-        mqttclient.publish(data.topic, data.message);
+    socket.on('unsubscribe', function (data) {
+	mqttclient.unsubscribe(data.topic);
     });
 });
 
@@ -39,6 +39,8 @@ mqttclient.on('message', function(topic, payload) {
          'payload' : payload
         }
     );
+	
+	console.log(topic, payload);
 
 });
 
