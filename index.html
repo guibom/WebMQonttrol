@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Control</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+    <!-- socket.io for communication -->
+    <script type="text/javascript" src="js/socket.io.min.js"></script>
+    <script type="text/javascript">
+
+        var light_status = false;
+        var livingTemp = new Array();
+        var basementTemp = new Array();
+        var socket = io.connect('http://192.168.0.175:3000');            
+        
+            socket.on('connect', function () {
+                socket.on('mqtt', function (msg) {
+                    var message = msg.topic.split('/');
+                    var area = message[1];
+                    var state = message[2];
+                    console.log(msg.topic, msg.payload);
+                    var timestamp = Math.round((new Date()).getTime() / 1000);
+
+                    $('#topic').html(msg.topic);
+                    $('#message').html(msg.topic + ', ' + msg.payload);
+                    switch (area) {
+                        case 'light': 
+                            $('#value1').html('(Switch value: ' + msg.payload + ')');                            
+                            if (msg.payload == 'true') {
+                                light_status = true;
+                                $('#Light1').text('On');
+                                $('#Light1').removeClass().addClass('btn btn-primary btn-lg label-success');
+                            } else {
+                                light_status = false;
+                                $('#Light1').text('Off');
+                                $('#Light1').removeClass().addClass('btn btn-primary btn-lg label-danger');
+                            }
+                            break;
+                        default: console.log('Error: Data do not match the MQTT topic.'); break;
+                    }
+         });
+    
+        //socket.emit('unsubscribe', {topic : 'home/light/1/#'});
+
+        //Topic subscriptions
+        socket.emit('subscribe', {topic : 'home/light/1/#'});
+
+         //Get Status of Light from server
+        socket.emit('publish', {topic : 'home/light/all/status', message : 'true'});
+        });
+
+        //Document ready
+        $(document).ready(function(){
+           // $('a[href="#sign_up"]').click(function(){
+           //    alert('Sign new href executed.'); 
+           // }); 
+            //HTML <a class="sign_new" href="#sign_up">Sign up</a>
+
+            $('#Light1').click(function(){ LightControl(); return false; });            
+
+        });
+
+        function LightControl()
+        {
+            if (light_status) {
+                socket.emit('publish', {topic : 'home/light/1/status', message : 'false'});
+            } else {
+                socket.emit('publish', {topic : 'home/light/1/status', message : 'true'});
+            }       
+        }
+
+    </script>
+  </head>
+
+  <body>
+    <div id="wrap">
+      <div class="container">
+        <div class="page-header"><h1><b>Home conditions</b></h1></div>
+            <div class="panel panel-default">
+              <div class="panel-body">
+                    <table class="table table-striped">
+                        <tr>
+                        <td width="40%" style="vertical-align:middle;"><h3>Light Bar 1</h3><small id="value1">(no value recieved)</small></td>
+                        <td style="vertical-align:middle;"></td>
+                        <!-- <td width="30%" style="vertical-align:middle;"><h4>&nbsp;<span id="label1" class="label">Unknown</span></h4></td> -->
+                        <td width="20%" style="vertical-align:middle;"><a href="#" id="Light1" class="btn btn-primary btn-lg" role="button">Unknown</a></h4></td>
+                        </tr>
+                    </table>
+              </div>
+            </div>
+          <div class="panel panel-default">
+            <div class="panel-body">
+                    <b>Latest MQTT message:  </b> <small id="message">no message recieved</small>
+            </div>
+          </div>
+
+        <div class="footer">
+        <small><p class="text-center">Longinus 2014</p></small>
+    </div>
+  </body>
+</html>
