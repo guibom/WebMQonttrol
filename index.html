@@ -31,7 +31,7 @@
                     switch (area) {
                         case 'light': 
                             $('#value1').html('(Switch value: ' + msg.payload + ')');                            
-                            if (msg.payload == 'true') {
+                            if (msg.payload == 'on') {
                                 light_status = true;
                                 $('#Light1').text('On');
                                 $('#Light1').removeClass().addClass('btn btn-primary btn-lg label-success');
@@ -45,13 +45,9 @@
                     }
          });
     
-        //socket.emit('unsubscribe', {topic : 'home/light/1/#'});
-
         //Topic subscriptions
-        socket.emit('subscribe', {topic : 'home/light/1/#'});
+        socket.emit('subscribe', {topic : 'home/light/1/status'});
 
-         //Get Status of Light from server
-        socket.emit('publish', {topic : 'home/light/all/status', message : 'true'});
         });
 
         //Document ready
@@ -68,9 +64,9 @@
         function LightControl()
         {
             if (light_status) {
-                socket.emit('publish', {topic : 'home/light/1/status', message : 'false'});
+                socket.emit('publish', {topic : 'home/light/1/off', message : '1'});
             } else {
-                socket.emit('publish', {topic : 'home/light/1/status', message : 'true'});
+                socket.emit('publish', {topic : 'home/light/1/on', message : '1'});
             }       
         }
 
@@ -80,7 +76,7 @@
   <body>
     <div id="wrap">
       <div class="container">
-        <div class="page-header"><h1><b>Home conditions</b></h1></div>
+        <div class="page-header"><h1><b>Home Control</b></h1></div>
             <div class="panel panel-default">
               <div class="panel-body">
                     <table class="table table-striped">
@@ -88,7 +84,7 @@
                         <td width="40%" style="vertical-align:middle;"><h3>Light Bar 1</h3><small id="value1">(no value recieved)</small></td>
                         <td style="vertical-align:middle;"></td>
                         <!-- <td width="30%" style="vertical-align:middle;"><h4>&nbsp;<span id="label1" class="label">Unknown</span></h4></td> -->
-                        <td width="20%" style="vertical-align:middle;"><a href="#" id="Light1" class="btn btn-primary btn-lg" role="button">Unknown</a></h4></td>
+                        <td width="10%" style="vertical-align:middle;"><a href="#" id="Light1" class="btn btn-primary btn-lg" role="button">Unknown</a></h4></td>
                         </tr>
                     </table>
               </div>

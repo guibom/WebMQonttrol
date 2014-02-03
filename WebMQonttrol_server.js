@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+//Modified by Longinus, 2014
 /**
  * Copyright (c) 2013, Fabian Affolter <fabian@affolter-engineering.ch>
  * Released under the MIT license. See LICENSE file for details.
@@ -6,7 +7,6 @@
 
 var mqtt = require('mqtt');
 var socket = require('socket.io');
-//var firmata = require('firmata');
 
 var mqttbroker = 'localhost';
 var mqttport = 1883;
@@ -23,12 +23,14 @@ io.sockets.on('connection', function (socket) {
         mqttclient.subscribe(data.topic);
     });
 
+    //Publish to topic/message
     socket.on('publish', function (data) {
     	mqttclient.publish(data.topic, data.message);
     });
 
+    //Unsubscribe from topic
     socket.on('unsubscribe', function (data) {
-	mqttclient.unsubscribe(data.topic);
+	   mqttclient.unsubscribe(data.topic);
     });
 });
 
@@ -39,59 +41,8 @@ mqttclient.on('message', function(topic, payload) {
          'payload' : payload
         }
     );
-	
+
+    //Log every MQTT message received
 	console.log(topic, payload);
 
 });
-
-// Setup the arduino
-//var board = new firmata.Board('/dev/ttyACM0', function(err) {
-//    if (err) {
-//        console.log(err);
-//        return;
-//    }
-
-//    board.pinMode(0, board.MODES.INPUT);
-//    board.pinMode(1, board.MODES.INPUT);
-//    board.pinMode(2, board.MODES.INPUT);
-//    board.pinMode(5, board.MODES.INPUT);
-
-//    // Analog pin 0
-//    var oldVal1;
-//    board.analogRead(0, function(val) {
-//        // Reduce the amount of messages
-//        if (val != oldVal1 && val != oldVal1 + 1 && val != oldVal1 - 1) {
-//            mqttclient.publish('home/living/temp', String(val));
-//        }
-//        oldVal1 = val;
-//    });
-
-//    // Analog pin 5
-//    var oldVal1;
-//    board.analogRead(5, function(val) {
-//        // Reduce the amount of messages
-//        if (val != oldVal1 && val != oldVal1 + 1 && val != oldVal1 - 1) {
-//            mqttclient.publish('home/basement/temp', String(val));
-//        }
-//        oldVal1 = val;
-//    });
-
-//    // Digital pin 2
-//    board.digitalRead(2, function(val) {
-//        mqttsend('home/front/door', val);
-//    });
-
-//    // Digital pin 3
-//    board.digitalRead(3, function(val) {
-//        mqttsend('home/back/door', val);
-//    });
-//});
-
-//function mqttsend(topic, val) {
-//    if (val == 1) {
-//        state = 'true';
-//    } else {
-//        state = 'false';
-//    }
-//    mqttclient.publish(topic, state);
-//};
