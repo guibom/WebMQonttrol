@@ -19,6 +19,9 @@ home/light/#/set 				(0-100) _Brightness Value_
 
 home/player/mpc/playpause		(1) _Action_
 home/player/mpc/stop			(1) _Action_
+home/player/mpc/volumeup		(1) _Action_
+home/player/mpc/volumedown		(1) _Action_
+home/player/mpc/fullscreen		(1) _Action_
 ```
 
 Status updates are set by controller after actions are performed
@@ -29,6 +32,7 @@ home/light/#/status/brightness 	(0-100)	_Read-only_
 home/player/mpc/status/playing		(1,0) _Persistent_
 home/player/mpc/status/total_time	(int in seconds)
 home/player/mpc/status/current_time	(int in seconds)
+home/player/mpc/status/filename		(string, null or 0 for none)
 ```
 
 Configuration values are read by the controller

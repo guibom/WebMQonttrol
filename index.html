@@ -1,28 +1,27 @@
+<!-- Copyright (c) 2014, Guilherme Ramos <longinus@gmail.com> -->
+<!-- Released under the MIT license. See LICENSE file for details. -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <title>Home Control</title>
 
     <!-- Bootstrap and Bootstrap-Slider CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/slider.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
     <style>
         .container {
             background: #fff;
         }
-        #alert {
-            display: none;
-        }
         #sl1 {
-            width: 200px;
+            width: 250px;
         }
     </style>
 
     <!-- jQuery -->
-    <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
     <!-- socket.io for communication -->
     <script type="text/javascript" src="js/socket.io.min.js"></script>
     <script type="text/javascript">
@@ -31,147 +30,244 @@
 
         //Global variables
         var MPCBar_total = 0;
-       
-            socket.on('connect', function () {
-                socket.on('mqtt', function (msg) {
+        var debug_show = false;  //If it's on, no panels will be hidden
 
-                    //Process specific topics received
-                    switch (msg.topic) {           
+        socket.on('connect', function () {
+            socket.on('mqtt', function (msg) {
 
-                        case 'home/light/1/status':
-                            if (msg.payload == 'on') {
-                                $('#Light1').text('On');
-                                $('#Light1').removeClass().addClass('btn btn-primary btn-lg label-success');          
-                            } else {
-                                $('#Light1').text('Off');
-                                $('#Light1').removeClass().addClass('btn btn-primary btn-lg label-danger');                                   
-                            }
-                        break;
+                //Process specific topics received
+                switch (msg.topic) {
 
-                        case 'home/light/1/status/brightness':
-                            $('#Light1_Brightness').text(msg.payload);
-                            $('#sl1').slider('setValue', parseInt(msg.payload));                            
-                        break;
+                case 'home/light/1/status':
+                    if (msg.payload == 'on') {
+                        $('#Light_1').html('<span class="glyphicon glyphicon-ok"></span> ON');                        
+                        $('#Light_1').removeClass('btn-danger').addClass('btn-success');
+                    } else {
+                        $('#Light_1').html('<span class="glyphicon glyphicon-remove"></span> OFF');   
+                        $('#Light_1').removeClass('btn-success').addClass('btn-danger');
+                    }
+                    break;
 
-                        case 'home/player/mpc/status/total_time':                                                            
-                            MPCBar_total = msg.payload;
-                        break;
+                case 'home/light/1/status/brightness':
+                    $('#Light_1_Brightness').text(msg.payload);
+                    $('#sl1').slider('setValue', parseInt(msg.payload));
+                    break;
 
-                        case 'home/player/mpc/status/current_time':                            
-                            var current_time = parseInt(msg.payload);
-                            document.getElementById('MPCBar').style.width = ((current_time * 100) / MPCBar_total) + '%';                            
-                        break;
+                case 'home/player/mpc':
+                    if (msg.payload == 'on' || debug_show) {
+                        $('#Player_MPC').removeClass('hide');
+                    } else {
+                        $('#Player_MPC').addClass('hide');
+                    }
+                    break;
 
-                        case 'home/player/mpc/status/playing':
-                            if (msg.payload == '1') {                      
-                                $('#MPCBar').removeClass('hide');
-                            } else {
-                                $('#MPCBar').addClass('hide');
-                            }
-                        break;
+                case 'home/player/mpc/status/total_time':
+                    MPCBar_total = msg.payload;
+                    break;
+
+                case 'home/player/mpc/status/current_time':
+                    var current_time = parseInt(msg.payload);
+                    document.getElementById('MPCBar').style.width = ((current_time * 100) / MPCBar_total) + '%';
+                    break;
+
+                case 'home/player/mpc/status/playing':
+                    if (msg.payload == '1') {
+                        $('#MPCBar').removeClass('hide');
+                    } else {
+                        $('#MPCBar').addClass('hide');
+                    }
+                    break;
+                
+                case 'home/player/mpc/status/filename':
+                    if (msg.payload != "" && msg.payload != "0") {
+                        $('#mpc_filename').html(msg.payload); 
+                    } else {
+                        $('#mpc_filename').html(''); 
                     }
 
-                    //Status messages                   
-                    $('#message').html(msg.topic + ', ' + msg.payload);
+                    break;
+                }
 
-                });
-    
-                //Topic subscriptions
-                socket.emit('subscribe', {topic : 'home/light/1/status/#'});           
-                socket.emit('subscribe', {topic : 'home/player/mpc/status/#'});                      
-            });    
-  </script>
-  </head>
+                //Status messages                   
+                $('#message').html(msg.topic + ', ' + msg.payload);
 
-  <body>
+            });
+
+            //Topic subscriptions
+            socket.emit('subscribe', 
+                {topic: 'home/light/1/status/#'}, 
+                {topic: 'home/player/mpc'}, 
+                {topic: 'home/player/mpc/status/#'}
+                );
+
+        });
+    </script>
+</head>
+
+<body>
     <div id="wrap">
-      <div class="container">
-        <div class="page-header"><h3><b>Home Control</b></h3></div>
+        <div class="container">
+            <div class="page-header">
+                <h3><b>Home Control</b></h3>
+            </div>
             <div class="panel panel-default">
-                 <div class="panel-heading">
+                <div class="panel-heading">
                     <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>
                 </div>
-              <div class="panel-body">
-                    <table class="table table-striped">
-                        <tr>
-                        <td width="40%" style="vertical-align:middle;"><h3>Lightbar Corner</h3></td>
-                        <td width="20%" style="vertical-align:middle;"><input type="text" class="span2" value="0" id="sl1" data-slider-min="0" data-slider-max="100"></td>
-                        <td width="20%"><h2><span id="Light1_Brightness" class="label label-default">-</span></h2></td>
-                        <td width="10%" style="vertical-align:middle;"><h4><a href="#" id="Light1" class="btn btn-primary btn-lg" role="button">Unknown</a></h4></td>
-                        </tr>
-                    </table>
-              </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-3" >
+                            <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; ">Light Corner</span></h2>
+                        </div>
+                        <div class="col-xs-2">
+                            <h2><span id="Light_1_Brightness" class="label label-default" style="vertical-align:top; display: block; ">0</span></h2>
+                        </div>
+                        <div class="col-xs-5" style="text-align:left; padding-top: 17px">
+                            <div class="well well-sm ">&nbsp;&nbsp;<input type="text" class="span2" value="0" id="sl1" data-slider-min="0" data-slider-max="100"></div>
+                        </div>
+                        <div class="col-xs-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
+                        </div>
+                    </div>                    
+                </div>
             </div>
 
-            <div class="panel panel-default">
+            <div class="panel panel-default" id="Player_MPC">
                 <div class="panel-heading">
                     <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-film"></span> Media Player Control</span></h3>
                 </div>
                 <div class="panel-body">
 
-                        <div class="progress progress-striped active">
-                          <div class="progress-bar" id="MPCBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                    <small id="mpc_filename">Filename of file playing</small>
+
+                    <div class="progress progress-striped active">
+                        <div class="progress-bar" id="MPCBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <button type="button" id="MPC_PlayPause" class="btn btn-primary btn-lg btn-block">
+                            <span class="glyphicon glyphicon-play"></span> Play
+                            </button>
                         </div>
+                        <div class="col-xs-2">
+                            <button type="button" id="MPC_PlayPause" class="btn btn-primary btn-lg btn-block">
+                            <span class="glyphicon glyphicon-pause"></span> Pause
+                            </button>
+                        </div>
+                        <div class="col-xs-2">
+                            <button type="button" id="MPC_Stop" class="btn btn-primary btn-lg btn-block">
+                            <span class="glyphicon glyphicon-stop"></span> Stop
+                            </button>
+                        </div>
+                        <div class="col-xs-2">
+                            <button type="button" id="MPC_VolUp" class="btn btn-primary btn-lg btn-block">
+                            <span class="glyphicon glyphicon-volume-up"></span> Vol. Up
+                            </button>
+                        </div>
+                        <div class="col-xs-2">
+                            <button type="button" id="MPC_VolDown" class="btn btn-primary btn-lg btn-block">
+                            <span class="glyphicon glyphicon-volume-down"></span> Vol. Down
+                            </button>
+                        </div>
+                        <div class="col-xs-2">
+                            <button type="button" id="MPC_Fullscreen" class="btn btn-primary btn-lg btn-block">
+                            <span class="glyphicon glyphicon-fullscreen"></span> Fullscreen
+                            </button>
+                        </div>
+                    </div>
 
                 </div>
             </div>
-            
-          <div class="panel panel-default">
-            <div class="panel-body">
-                <button type="button" class="btn btn-default btn-lg">
-                    <span class="glyphicon glyphicon-play"></span> Play
-                </button>
-                <button type="button" class="btn btn-default btn-lg">
-                    <span class="glyphicon glyphicon-pause"></span> Pause
-                </button>
-                <button type="button" class="btn btn-default btn-lg">
-                    <span class="glyphicon glyphicon-stop"></span> Stop
-                </button>
 
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <b>Latest MQTT message:  </b>  <small id="message">no message recieved</small>
+                </div>
             </div>
-          </div>
 
-        <div class="panel panel-default">
-            <div class="panel-body">
-                    <b>Latest MQTT message:  </b> <small id="message">no message recieved</small>
+            <div class="footer">
+                <small><p class="text-center">Longinus 2014</p></small>
             </div>
-          </div>
-         
 
-        <div class="footer">
-        <small><p class="text-center">Longinus 2014</p></small>
-    </div>
+            <!-- Bootstrap Slider -->
+            <script type="text/javascript" src="js/bootstrap-slider.js"></script>
+            <script src="js/modernizr.js"></script>
+            <script>
 
-    <!-- Bootstrap Slider -->
-    <script type="text/javascript" src="js/bootstrap-slider.js"></script>
-    <script src="js/modernizr.js"></script>
-    <script>
 
-        //Light1 Slider
-        $('#sl1').slider({            
-          formater: function(value) {
-            return 'Value: '+value;
-          }
-        });
+                //Light 1 slider events
+                $('#sl1').slider({
+                    formater: function (value) {
+                        return 'Value: ' + value;
+                    }                
+                }).slider()                
+                    .on('slideStop', function (ev) {
+                        socket.emit('publish', {
+                            topic: 'home/light/1/set',
+                            message: new String(ev.value)
+                        });
+                    });
 
-        //Slider handlers
-        $('#sl1').slider()
-            .on('slideStop', function(ev){
-                socket.emit('publish', {topic : 'home/light/1/set', message : new String(ev.value)});
-        });
 
-        //OnClick handlers
-        $('#Light1').click(function(){ LightControl(); return false; });  
+                //Button event handler. Redirects to the appropriate function 
+                $('.btn').click(function () {
+                    //Get type of button from the start of the ID
+                    var id_type = this.id.split("_");
 
-        //Send light messages on button press
-        function LightControl()
-        {
-            switch ($('#Light1').text().toLowerCase()){
-                case 'on':      socket.emit('publish', {topic : 'home/light/1/off', message : '1'}); break;
-                case 'off':     socket.emit('publish', {topic : 'home/light/1/on', message : '1'}); break;                
-            }  
-        }        
-    </script>
+                    switch (id_type[0]) {
 
-  </body>
+                    case 'MPC':
+                        MPCControl($(this));
+                        break;
+
+                    case 'Light':
+                        LightControl($(this));
+                        break;
+                    }
+                });
+
+                 //Send light messages on button press
+                function LightControl(controller) {    
+                    //Get light number from jquery object's id
+                    var light_id = controller.attr("id").split("_");
+                    light_id = light_id[1];
+
+                    switch ($.trim($(controller).text().toLowerCase())) {
+
+                    case 'on':
+                        socket.emit('publish', {
+                            topic: 'home/light/'+ light_id +'/off',
+                            message: '1'
+                        });
+                        break;
+
+                    case 'off':
+                        socket.emit('publish', {
+                            topic: 'home/light/'+ light_id +'/on',
+                            message: '1'
+                        });
+                        break;
+                    }
+                }
+
+                //Send MPC control message, based on element ID
+                function MPCControl(controller) {
+                    //Second part of MPC_xxx, lowercased is the MQTT message
+                    var action = controller.attr("id").split("_");
+                    action = action[1].toLowerCase();
+
+                    socket.emit('publish', {
+                        topic: 'home/player/mpc/' + action,
+                        message: '1'
+                    });
+                }
+
+
+
+                $(window).resize(function () {
+                //    console.log($(document).width());
+                });
+
+            </script>
+</body>
 </html>
