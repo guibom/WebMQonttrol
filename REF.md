@@ -1,41 +1,44 @@
-Controller messages are set at start, and a Will defined for unexpect disconnects.
+## Interfaces
+Controller messages are set at start, and a will defined for unexpect disconnects.
 Players get the information from EventGhost running on my HTPC
 ```
-home/controller/MQTTRF			(on, off) _Persistent_
-home/controller/MQTTRF/light/#	(string) _ID of light_ _Persistent_
+home/controller/MQTTRF			(on, off) Retained
+home/controller/MQTTRF/light/#	(string) _ID of light_ Retained
 
-home/player/mpc					(on, off) _Persistent_		
-home/player/itunes				(on, off) _Persistent_
-home/player/xbmc				(on, off) _Persistent_
+home/player/mpc					(on, off) Retained		
+home/player/itunes				(on, off) Retained
+home/player/xbmc				(on, off) Retained
 ```
 
-Actions are received by controller
+## Action Messages
+Actions are received by other clients, and are usually just a trigger event
 ```
-home/light/#/on  				(1) _Action_
-home/light/#/off  				(1) _Action_
-home/light/#/fade_on			(int speed mili) _Action_
-home/light/#/fade_off			(int speed mili) _Action_
+home/light/#/on  				(1)
+home/light/#/off  				(1)
+home/light/#/fade_on			(int speed mili)
+home/light/#/fade_off			(int speed mili)
 home/light/#/set 				(0-100) _Brightness Value_
 
-home/player/mpc/playpause		(1) _Action_
-home/player/mpc/stop			(1) _Action_
-home/player/mpc/volumeup		(1) _Action_
-home/player/mpc/volumedown		(1) _Action_
-home/player/mpc/fullscreen		(1) _Action_
+home/player/mpc/playpause		(1)
+home/player/mpc/stop			(1)
+home/player/mpc/volumeup		(1)
+home/player/mpc/volumedown		(1)
+home/player/mpc/fullscreen		(1)
 ```
 
-Status updates are set by controller after actions are performed
+## Status Messages
+Status updates are set by clients after actions are performed, usually persist
 ```
-home/light/#/status        		(on, off) _Read-only_
-home/light/#/status/brightness 	(0-100)	_Read-only_
-
-home/player/mpc/status/playing		(1,0) _Persistent_
+home/light/#/status        		    (on, off) Read-only
+home/light/#/status/brightness      (0-100)	Read-only
+home/player/mpc/status/playing		(0 stopped, 1 playing, 2 paused) Retained
 home/player/mpc/status/total_time	(int in seconds)
 home/player/mpc/status/current_time	(int in seconds)
 home/player/mpc/status/filename		(string, null or 0 for none)
 ```
 
-Configuration values are read by the controller
+## Configuration Messages
+Configuration values are used to tweak the clients, updating their default values
 ```
 home/light/#/config/min_value	(byte)
 home/light/#/config/max_value	(byte)
