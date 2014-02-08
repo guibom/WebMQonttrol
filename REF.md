@@ -1,4 +1,4 @@
-## Interfaces
+### Interfaces
 Controller messages are set at start, and a will defined for unexpect disconnects.
 Players get the information from EventGhost running on my HTPC
 ```
@@ -10,7 +10,7 @@ home/player/itunes				(on, off) Retained
 home/player/xbmc				(on, off) Retained
 ```
 
-## Action Messages
+### Action Messages
 Actions are received by other clients, and are usually just a trigger event
 ```
 home/light/#/on  				(1)
@@ -26,7 +26,7 @@ home/player/mpc/volumedown		(1)
 home/player/mpc/fullscreen		(1)
 ```
 
-## Status Messages
+### Status Messages
 Status updates are set by clients after actions are performed, usually persist
 ```
 home/light/#/status        		    (on, off) Read-only
@@ -37,7 +37,7 @@ home/player/mpc/status/current_time	(int in seconds)
 home/player/mpc/status/filename		(string, null or 0 for none)
 ```
 
-## Configuration Messages
+### Configuration Messages
 Configuration values are used to tweak the clients, updating their default values
 ```
 home/light/#/config/min_value	(byte)
