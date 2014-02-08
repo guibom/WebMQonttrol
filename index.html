@@ -9,15 +9,21 @@
     <title>Home Control</title>
 
     <!-- Bootstrap and Bootstrap-Slider CSS -->
-    <link href="css/slider.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/jquery.nouislider.min.css" rel="stylesheet">
     <style>
         .container {
             background: #fff;
         }
         #sl1 {
-            width: 220px;
+            width: 400px;
         }
+        .label {
+          padding: .2em .2em .3em;
+        }
+        .row {margin:  -7.5px}
+        [class*="col-"] {padding: 0 5px;}
+
     </style>
 
     <!-- jQuery -->
@@ -50,7 +56,7 @@
 
                 case 'home/light/1/status/brightness':
                     $('#Light_1_Brightness').text(msg.payload);
-                    $('#sl1').slider('setValue', parseInt(msg.payload));
+                    $('#slider1').val(parseInt(msg.payload));
                     break;
 
                 case 'home/player/mpc':
@@ -117,13 +123,13 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-xs-4" >
-                            <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; ">Light Corner</span></h2>
+                            <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">Light Corner</span></h2>
                         </div>
                         <div class="col-xs-1">
-                            <h2><span id="Light_1_Brightness" class="label label-default" style="vertical-align:top; display: block; ">N/A</span></h2>
+                            <h2><span id="Light_1_Brightness" class="label label-default" style="vertical-align:top; display: block;">N/A</span></h2>
                         </div>
-                        <div class="col-xs-5" style="text-align:left; padding-top: 17px">
-                            <div class="well well-sm ">&nbsp;&nbsp;<input type="text" class="span2" value="0" id="sl1" data-slider-min="0" data-slider-max="100"></div>
+                        <div class="col-xs-5" style="text-align:center; padding-top: 28px; padding-left: 20px; padding-right: 20px">                            
+                            <div class="noUiSlider" id="slider1"></div>                            
                         </div>
                         <div class="col-xs-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
                         </div>
@@ -189,24 +195,28 @@
                 <small><p class="text-center">Longinus 2014</p></small>
             </div>
 
-            <!-- Bootstrap Slider -->
-            <script type="text/javascript" src="js/bootstrap-slider.js"></script>
-            <script src="js/modernizr.js"></script>
+            <!-- .noUIslider Slider -->
+            <script src="js/jquery.nouislider.min.js"></script>
+            <script src="js/modernizr.js"></script>                
+
             <script>
 
-
-                //Light 1 slider events
-                $('#sl1').slider({
-                    formater: function (value) {
-                        return 'Value: ' + value;
-                    }                
-                }).slider()                
-                    .on('slideStop', function (ev) {
+                // Run noUiSlider
+                $('.noUiSlider').noUiSlider({
+                    range: [0, 100]
+                    ,start: 0
+                    ,step: 1
+                    ,handles: 1     
+                    ,serialization: {
+                        resolution: 1
+                    }
+                    ,set: function(){                        
                         socket.emit('publish', {
                             topic: 'home/light/1/set',
-                            message: new String(ev.value)
+                            message: new String($("#slider1").val())
                         });
-                    });
+                    }           
+                });
 
 
                 //Button event handler. Redirects to the appropriate function 
@@ -262,11 +272,12 @@
                     });
                 }
 
-
-
-                $(window).resize(function () {
-                //    console.log($(document).width());
-                });
+                // $(window).resize(function () {
+                //     var new_size = ($(document).width() * 400) / 1680
+                //     console.log(new_size);
+                //     document.getElementById('sl1').style.width = 20;
+                //     console.log("Grabbed", $("#sl1").width());
+                // });
 
             </script>
 </body>
