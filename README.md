@@ -5,12 +5,13 @@ Web interface to view/set MQTT messages for home automation, using Node.js and S
 
 ###Overview
 
+![alt text](https://raw2.github.com/guibom/WebMQonttrol/master/docs/screenshot.png "Screenshot")
+
+###Structure
+
 ![alt text](https://raw2.github.com/guibom/WebMQonttrol/master/docs/WebMQonttrol_Structure.png "Structure overview")
 
-
-
 ###Dependencies
-
 - [node.js](http://www.nodejs.org/)
 - [mqtt](https://github.com/adamvr/MQTT.js/)
 - [socket.io](http://socket.io/)
