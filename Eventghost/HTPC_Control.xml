@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<EventGhost Version="1610" Guid="{D61F2374-23B3-48FD-8E4C-85EEB6EDA0C1}" Time="1391986303.26">
+    <Autostart Name="Autostart" Expanded="True">
+        <Plugin Identifier="OSE" Guid="{D3D2DDD1-9BEB-4A26-969B-C82FA8EAB280}" File="OSE">
+            gAJYAwAAAD4+IHEAWAQAAAB84oCicQGGcQIu
+        </Plugin>
+        <Plugin Identifier="HID" Guid="{05A690D9-27C2-4AC5-B0DD-2F562619E922}" File="HID">
+            gAIoWAAAAABxAIiJiVVeXFw/XGhpZCN2aWRfMDc1NSZwaWRfMjYyNiZtaV8wMSZjb2wwMiM3JjE3MzQ3ODgxJjAmMDAwMSN7NGQxZTU1YjItZjE2Zi0xMWNmLTg4Y2ItMDAxMTExMDAwMDMwfXEBTVUHWBEAAAB3d3cuaXJmbWVkaWEuY29tIHECTSYmWA8AAABXLTAxUk4gVVNCX1YzLjFxA02CKYlLAHRxBC4=
+        </Plugin>
+        <Plugin Identifier="Keyboard" Guid="{59CBD10F-C1D8-4ADB-999B-9B76BA360F1F}" File="Keyboard">
+            gAIpLg==
+        </Plugin>
+        <Plugin Identifier="MediaPlayerClassic" Guid="{DD75104D-D586-438A-B63D-3AD01A4D4BD3}" File="MediaPlayerClassic">
+            gAJYJAAAAEM6XFByb2dyYW0gRmlsZXNcTVBDLUhDXG1wYy1oYzY0LmV4ZXEAhXEBLg==
+        </Plugin>
+        <Plugin Identifier="MQTTthreads" Guid="{44A1C5BC-311A-4651-B4A6-629BEAC0A80B}" File="MQTT Client">
+            gAIpLg==
+        </Plugin>
+        <Plugin Identifier="iTunes2" Guid="iTunes" File="iTunes">
+            gAIpLg==
+        </Plugin>
+        <Plugin Identifier="Task" Guid="{D1748551-C605-4423-B392-FB77E6842437}" File="Task">
+            gAIpLg==
+        </Plugin>
+        <Action>
+            EventGhost.NewJumpIf(XmlIdLink(11), 2, True)
+        </Action>
+    </Autostart>
+    <Macro Name="Setup" id="11" Expanded="True">
+        <Action>
+            EventGhost.DisableItem(XmlIdLink(118))
+        </Action>
+        <Action>
+            EventGhost.DisableItem(XmlIdLink(108))
+        </Action>
+        <Action>
+            EventGhost.DisableItem(XmlIdLink(28))
+        </Action>
+        <Action>
+            EventGhost.DisableItem(XmlIdLink(48))
+        </Action>
+        <Action>
+            EventGhost.EnableItem(XmlIdLink(97))
+        </Action>
+        <Action>
+            EventGhost.EnableItem(XmlIdLink(22))
+        </Action>
+        <Action>
+            EventGhost.EnableItem(XmlIdLink(34))
+        </Action>
+        <Action Name="Python Global Variables">
+            EventGhost.PythonScript(u'eg.globals.iTunesPlaying = False;')
+        </Action>
+        <Action Name="MQTT Client: home/player/+/+">
+            MQTTthreads.MQTTclient(u'HTPC', u'192.168.0.175', 1883, u'home/player/+/+')
+        </Action>
+    </Macro>
+    <Folder Name="On screen explorer">
+        <Macro Name="Show explorer" id="22">
+            <Event Name="HID.Button.548" />
+            <Action>
+                OSE.ShowMenu((75, 75, 75), (180, 180, 180), '0;-48;0;0;0;400;0;0;0;238;0;0;0;0;MS Shell Dlg 2', u'OSE', u'Execute', 1, u'C:\\Users\\Longinus\\Downloads', u'*.avi, *.mkv, *.wmv, *.mp4', True, (180, 180, 180), (75, 75, 75), True)
+            </Action>
+            <Action>
+                Window.FindWindow(None, u'OS_Explorer', None, None, None, None, False, 0.0, 2)
+            </Action>
+            <Action>
+                Window.BringToFront()
+            </Action>
+            <Action>
+                EventGhost.EnableItem(XmlIdLink(28))
+            </Action>
+        </Macro>
+        <Macro Name="Open Video" id="28" Enabled="False">
+            <Event Name="Keyboard.Return" />
+            <Action>
+                OSE.Execute(20, u'', u'')
+            </Action>
+            <Action>
+                EventGhost.NewJumpIf(XmlIdLink(38), 1, False)
+            </Action>
+            <Action>
+                System.Execute(u'C:\\Program Files\\MPC-HC\\mpc-hc64.exe', u'"{eg.result}" /monitor 2 /fullscreen /play /close', 0, False, 2, u'', False)
+            </Action>
+            <Action>
+                EventGhost.DisableItem(XmlIdLink(28))
+            </Action>
+        </Macro>
+        <Macro Name="Cancel Video Selection" id="34">
+            <Event Name="HID.Button.549" />
+            <Action>
+                OSE.Cancel()
+            </Action>
+            <Action>
+                EventGhost.DisableItem(XmlIdLink(28))
+            </Action>
+        </Macro>
+        <Macro Name="Blank" id="38">
+            <Event Name="Keyboard.LAlt+LWin+U00+Return" />
+        </Macro>
+    </Folder>
+    <Folder Name="iTunes" Expanded="True">
+        <Folder Name="iTunes Control" Expanded="True">
+            <Macro Name="iTunes: Open" id="42" Enabled="False">
+                <Event Name="Main.home/player/itunes/openclose" />
+                <Action>
+                    iTunes2.StartApp()
+                </Action>
+                <Action>
+                    Window.FindWindow(u'iTunes.exe', None, None, None, None, None, False, 10.0, 0)
+                </Action>
+                <Action>
+                    EventGhost.Wait(5.0)
+                </Action>
+                <Action>
+                    Window.BringToFront()
+                </Action>
+            </Macro>
+            <Macro Name="iTunes: Close" id="48">
+                <Event Name="Main.home/player/itunes/openclose" />
+                <Action>
+                    iTunes2.Exit()
+                </Action>
+            </Macro>
+            <Macro Name="iTunes #2: Play/Pause">
+                <Event Name="Main.home/player/itunes/playpause" />
+                <Action Name="Trigger Action and raise status event">
+                    EventGhost.PythonScript(u"if (eg.globals.iTunesPlaying):\n    eg.plugins.iTunes2.Pause();\n    eg.globals.iTunesPlaying = False;\n    eg.plugins.EventGhost.TriggerEvent(u'iTunes.Paused', 0.0);\nelse:\n    eg.plugins.iTunes2.Play();\n    eg.globals.iTunesPlaying = True;\n    eg.plugins.EventGhost.TriggerEvent(u'iTunes.Playing', 0.0);")
+                </Action>
+            </Macro>
+            <Macro Name="iTunes #2: Stop">
+                <Event Name="Main.home/player/itunes/stop" />
+                <Action>
+                    iTunes2.Stop()
+                </Action>
+                <Action>
+                    EventGhost.TriggerEvent(u'iTunes.Stopped', 0.0)
+                </Action>
+            </Macro>
+            <Macro Name="iTunes #2: Change volume by: 5%">
+                <Event Name="Main.home/player/itunes/volumeup" />
+                <Action>
+                    iTunes2.ChangeVolume(5)
+                </Action>
+            </Macro>
+            <Macro Name="iTunes #2: Change volume by: -5%">
+                <Event Name="Main.home/player/itunes/volumedown" />
+                <Action>
+                    iTunes2.ChangeVolume(-5)
+                </Action>
+            </Macro>
+        </Folder>
+        <Folder Name="iTunes Status" Expanded="True">
+            <Macro Name="iTunes Opened">
+                <Event Name="Task.NewWindow.iTunes" />
+                <Event Name="Task.Activated.iTunes" />
+                <Action>
+                    EventGhost.EnableItem(XmlIdLink(48))
+                </Action>
+                <Action>
+                    EventGhost.DisableItem(XmlIdLink(42))
+                </Action>
+                <Action Name="MQTT Client: home/player/itunes, on">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/itunes', u'on', 0, True)
+                </Action>
+            </Macro>
+            <Macro Name="iTunes Closed">
+                <Event Name="Task.Destroyed.iTunes" />
+                <Action>
+                    EventGhost.EnableItem(XmlIdLink(42))
+                </Action>
+                <Action>
+                    EventGhost.DisableItem(XmlIdLink(48))
+                </Action>
+                <Action>
+                    EventGhost.NewJumpIf(XmlIdLink(148), 2, False)
+                </Action>
+            </Macro>
+            <Macro Name="Music Playing Title" Expanded="True">
+                <Event Name="iTunes2.TrackChanged" />
+                <Action Name="Get Music Title and return">
+                    EventGhost.PythonScript(u'if eg.event.payload[\'name\']:\n    eg.result = eg.event.payload[\'name\'] + ", " + eg.event.payload[\'album\'] + ", " + eg.event.payload[\'artist\'];\n')
+                </Action>
+                <Action Name="MQTT Client: home/player/itunes/status/title, eg.result">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/itunes/status/title', u'{eg.result}', 0, True)
+                </Action>
+            </Macro>
+            <Macro Name="iTunes Playing" Expanded="True">
+                <Event Name="iTunes2.TrackChanged" />
+                <Event Name="Main.iTunes.Playing" />
+                <Action>
+                    EventGhost.PythonCommand(u'eg.globals.iTunesPlaying = True')
+                </Action>
+                <Action Name="MQTT Client: home/player/itunes/status/playing, 1">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/itunes/status/playing', u'1', 0, True)
+                </Action>
+            </Macro>
+            <Macro Name="iTunes Paused" Expanded="True">
+                <Event Name="Main.iTunes.Paused" />
+                <Action>
+                    EventGhost.PythonCommand(u'eg.globals.iTunesPlaying = False')
+                </Action>
+                <Action Name="MQTT Client: home/player/itunes/status/playing, 2">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/itunes/status/playing', u'2', 0, True)
+                </Action>
+            </Macro>
+            <Macro Name="iTunes Stopped" Expanded="True">
+                <Event Name="Main.iTunes.Stopped" />
+                <Action>
+                    EventGhost.PythonCommand(u'eg.globals.iTunesPlaying = False')
+                </Action>
+                <Action Name="MQTT Client: home/player/itunes/status/playing, 0">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/itunes/status/playing', u'0', 0, True)
+                </Action>
+            </Macro>
+            <Macro Name="Clear MQTT Status" id="148">
+                <Action Name="MQTT Client: home/player/itunes/status/playing, None">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/itunes/status/playing', u'', 0, True)
+                </Action>
+                <Action Name="MQTT Client: home/player/itunes/status/title, None">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/itunes/status/title', u'', 0, True)
+                </Action>
+                <Action Name="MQTT Client: home/player/itunes, off">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/itunes', u'off', 0, True)
+                </Action>
+                <Action>
+                    EventGhost.FlushEvents()
+                </Action>
+            </Macro>
+        </Folder>
+    </Folder>
+    <Folder Name="MPC">
+        <Folder Name="MPC Control" Expanded="True">
+            <Macro Name="Media Player Classic: Play/Pause" Expanded="True">
+                <Event Name="Main.home/player/mpc/playpause" />
+                <Action>
+                    MediaPlayerClassic.PlayPause()
+                </Action>
+            </Macro>
+            <Macro Name="Media Player Classic: Stop" Expanded="True">
+                <Event Name="Main.home/player/mpc/stop" />
+                <Action>
+                    MediaPlayerClassic.Stop()
+                </Action>
+            </Macro>
+            <Macro Name="Media Player Classic: Volume Up" Expanded="True">
+                <Event Name="Main.home/player/mpc/volumeup" />
+                <Action>
+                    MediaPlayerClassic.VolumeUp()
+                </Action>
+            </Macro>
+            <Macro Name="Media Player Classic: Volume Down" Expanded="True">
+                <Event Name="Main.home/player/mpc/volumedown" />
+                <Action>
+                    MediaPlayerClassic.VolumeDown()
+                </Action>
+            </Macro>
+            <Macro Name="Media Player Classic: Fullscreen" Expanded="True">
+                <Event Name="Main.home/player/mpc/fullscreen" />
+                <Action>
+                    MediaPlayerClassic.Fullscreen()
+                </Action>
+            </Macro>
+        </Folder>
+        <Folder Name="MPC Status">
+            <Macro Name="MPC Opened">
+                <Event Name="MPC-HC.Connected" />
+                <Action>
+                    EventGhost.Wait(1.0)
+                </Action>
+                <Action Name="MQTT Client: home/player/mpc, on">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc', u'on', 0, True)
+                </Action>
+                <Action>
+                    EventGhost.TriggerEvent(u'MPC-HC.Playstate.Play', 0.0)
+                </Action>
+            </Macro>
+            <Macro Name="MPC Started Playing" id="97">
+                <Event Name="MPC-HC.Playstate.Play" />
+                <Action>
+                    EventGhost.DisableItem(XmlIdLink(97))
+                </Action>
+                <Action>
+                    MediaPlayerClassic.GetTimes()
+                </Action>
+                <Action Name="Send total time to MQTT">
+                    EventGhost.PythonScript(u'from datetime import datetime, date, time\n\nif eg.result[2]:\n    t_total = datetime.strptime(eg.result[2], "%H:%M:%S");\n    eg.globals.sec_total = ((t_total.hour * 3600) + (t_total.minute * 60) + t_total.second);\n\n    eg.plugins.MQTTthreads.publishMQTT(u\'HTPC\', u\'192.168.0.175\', 1883, u\'home/player/mpc/status/total_time\', u\'{eg.globals.sec_total}\', 0, True);')
+                </Action>
+                <Action>
+                    EventGhost.EnableItem(XmlIdLink(108))
+                </Action>
+                <Action Name="MQTT Client: home/player/mpc/status/playing, 1">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc/status/playing', u'1', 0, True)
+                </Action>
+                <Action>
+                    MediaPlayerClassic.GetNowPlaying()
+                </Action>
+                <Action Name="MQTT Client: home/player/mpc/status/filename">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc/status/filename', u'{eg.result}', 0, True)
+                </Action>
+                <Action>
+                    EventGhost.EnableItem(XmlIdLink(118))
+                </Action>
+                <Action>
+                    EventGhost.NewJumpIf(XmlIdLink(108), 2, False)
+                </Action>
+            </Macro>
+            <Macro Name="Send MQTT Playing Times" id="108" Enabled="False">
+                <Event Name="Main.UpdateMQTTTime" />
+                <Action>
+                    MediaPlayerClassic.GetTimes()
+                </Action>
+                <Action Name="Send current playing time to MQTT">
+                    EventGhost.PythonScript(u'from datetime import datetime, date, time\nfrom threading import Timer\n\nif eg.result[0]:\n    t_current = datetime.strptime(eg.result[0], "%H:%M:%S");\n    eg.globals.sec_current = ((t_current.hour * 3600) + (t_current.minute * 60) + t_current.second);\n\n    eg.plugins.MQTTthreads.publishMQTT(u\'HTPC\', u\'192.168.0.175\', 1883, u\'home/player/mpc/status/current_time\', u\'{eg.globals.sec_current}\', 0, False)\n\n    t = Timer(5.0, eg.TriggerEvent, ["UpdateMQTTTime"])\n    t.start()')
+                </Action>
+                <Action Name="Waits 5 seconds and fire the event again">
+                    EventGhost.Comment()
+                </Action>
+            </Macro>
+            <Macro Name="MPC Paused">
+                <Event Name="MPC-HC.Playstate.Pause" />
+                <Action Name="MQTT Client: home/player/mpc/status/playing, 2">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc/status/playing', u'2', 0, True)
+                </Action>
+                <Action>
+                    EventGhost.DisableItem(XmlIdLink(108))
+                </Action>
+                <Action>
+                    EventGhost.EnableItem(XmlIdLink(97))
+                </Action>
+            </Macro>
+            <Macro Name="MPC Stopped Playing" id="118" Enabled="False">
+                <Event Name="MPC-HC.State.Closing" />
+                <Event Name="MPC-HC.Playstate.Stop" />
+                <Action>
+                    EventGhost.DisableItem(XmlIdLink(118))
+                </Action>
+                <Action>
+                    EventGhost.DisableItem(XmlIdLink(108))
+                </Action>
+                <Action Name="MQTT Client: home/player/mpc/status/playing, 0">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc/status/playing', u'0', 0, True)
+                </Action>
+                <Action>
+                    EventGhost.EnableItem(XmlIdLink(97))
+                </Action>
+            </Macro>
+            <Macro Name="Clear MQTT Status">
+                <Event Name="MPC-HC.EndOfStream" />
+                <Event Name="MPC-HC.State.Closed" />
+                <Action Name="MQTT Client: home/player/mpc/status/total_time, None">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc/status/total_time', u'', 0, True)
+                </Action>
+                <Action Name="MQTT Client: home/player/mpc/status/current_time, None">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc/status/current_time', u'', 0, True)
+                </Action>
+                <Action Name="MQTT Client: home/player/mpc/status/playing, None">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc/status/playing', u'', 0, True)
+                </Action>
+                <Action Name="MQTT Client: home/player/mpc/status/filename, None">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc/status/filename', u'', 0, True)
+                </Action>
+                <Action Name="MQTT Client: home/player/mpc, off">
+                    MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/player/mpc', u'off', 0, True)
+                </Action>
+                <Action>
+                    EventGhost.FlushEvents()
+                </Action>
+            </Macro>
+        </Folder>
+    </Folder>
+</EventGhost>
