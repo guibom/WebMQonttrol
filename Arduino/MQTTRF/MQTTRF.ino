@@ -1,6 +1,8 @@
-/*
-  MQTTRF Arduino web controller to RF433 transmitter controller for lights
-  */
+// MQTTRF Arduino web controller to RF433 transmitter controller
+// Copyright (c) 2014, Guilherme Ramos <longinus@gmail.com>
+// https://github.com/guibom/WebMQonttrol
+// Released under the MIT license. See LICENSE file for details.
+
 #include <avr/pgmspace.h>
 #include <SPI.h>
 #include <Ethernet.h>

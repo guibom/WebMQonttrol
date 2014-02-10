@@ -2,6 +2,7 @@
 /**
  * Moddified to add support for publishing messages and other tweaks
  * Copyright (c) 2014, Guilherme Ramos <longinus@gmail.com>
+ * https://github.com/guibom/WebMQonttrol
  * Released under the MIT license. See LICENSE file for details.
  */
 /**
