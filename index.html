@@ -94,9 +94,26 @@
                         if (msg.payload == 'on') {                            
                             $("#iTunes_OpenClose").html('<span class="glyphicon glyphicon-off"></span> Close'); 
                             $("#iTunes_OpenClose").addClass('btn-warning').removeClass('btn-primary')
+                            //Show title text element
+                            $('#iTunes_Title').removeClass('hide');
+
+                            //Enable all the buttons
+                            $('#iTunes_Grid').find("button").each(function(index, element){
+                                $(this).removeClass('disabled');
+                            });
+
                         } else {
                             $("#iTunes_OpenClose").html('<span class="glyphicon glyphicon-off"></span> Open');
                             $("#iTunes_OpenClose").addClass('btn-primary').removeClass('btn-warning')
+                            //Hide title text element
+                            $('#iTunes_Title').addClass('hide');
+
+                            //Disable all the buttons. 
+                            $('#iTunes_Grid').find("button").each(function(index, element){
+                                $(this).addClass('disabled');
+                            });
+                            //Re-enable OpenClose button, since it works without iTunes open.
+                            $('#iTunes_OpenClose').removeClass('disabled')
                         }
                     },
 
@@ -195,109 +212,123 @@
 <body>
     <div id="wrap">
         <div class="container">
-            <div class="page-header">
-                <!-- <h3><b>Home Control</b></h3> -->
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-xs-4" >
-                            <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">Light Corner</span></h2>
-                        </div>
-                        <div class="col-xs-1">
-                            <h2><span id="Light_1_Brightness" class="label label-default" style="vertical-align:top; display: block;">N/A</span></h2>
-                        </div>
-                        <div class="col-xs-5" style="text-align:center; padding-top: 28px; padding-left: 20px; padding-right: 20px">                            
-                            <div class="noUiSlider" id="slider1"></div>                            
-                        </div>
-                        <div class="col-xs-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
-                        </div>
-                    </div>                    
-                </div>
+
+            <div class="panel panel-default" style="border-radius: 0px; border: 0px; box-shadow: 0px 0px 0px 0px; margin-bottom: 0px">
+                <div class="panel-body" style="border-radius: 0px; ">
+                    <ul class="nav nav-tabs" id="homeTab">
+                      <li class="active"><a href="#TabShowAll" data-toggle="tab">Main</a></li>
+                      <li><a href="#Controller_Light" data-toggle="tab">Light</a></li>
+                      <li><a href="#Player_MPC" data-toggle="tab">MPC</a></li>
+                      <li><a href="#Player_iTunes" data-toggle="tab">iTunes</a></li>                  
+                    </ul>              
+                </div>  
             </div>
 
-            <div class="panel panel-default" id="Player_MPC">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-film"></span> Media Player Control</span></h3>
-                </div>
-                <div class="panel-body">
+            <!-- TAB PANE START -->
+            <div class="tab-content">       
 
-                    <small id="mpc_filename">Filename of file playing</small>
-
-                    <div class="progress progress-striped" id="MPCBar_Base">
-                        <div class="progress-bar" id="MPCBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                <div class="tab-pane panel panel-default active" id="Controller_Light">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>
                     </div>
-
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <button type="button" id="MPC_PlayPause" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-play"></span> Play
-                            </button>
-                        </div>
-                        <div class="col-xs-2">
-                            <button type="button" id="MPC_Stop" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-stop"></span> Stop
-                            </button>
-                        </div>
-                        <div class="col-xs-2">
-                            <button type="button" id="MPC_VolumeUp" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-volume-up"></span> Vol.Up
-                            </button>
-                        </div>
-                        <div class="col-xs-2">
-                            <button type="button" id="MPC_VolumeDown" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-volume-down"></span> Vol.Down
-                            </button>
-                        </div>
-                        <div class="col-xs-3">
-                            <button type="button" id="MPC_Fullscreen" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-fullscreen"></span> Fullscreen
-                            </button>
-                        </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-4" >
+                                <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">Light Corner</span></h2>
+                            </div>
+                            <div class="col-xs-1">
+                                <h2><span id="Light_1_Brightness" class="label label-default" style="vertical-align:top; display: block;">N/A</span></h2>
+                            </div>
+                            <div class="col-xs-5" style="text-align:center; padding-top: 28px; padding-left: 20px; padding-right: 20px">                            
+                                <div class="noUiSlider" id="slider1"></div>                            
+                            </div>
+                            <div class="col-xs-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
+                            </div>
+                        </div>                    
                     </div>
-
                 </div>
-            </div>
 
-            <div class="panel panel-default" id="Player_iTunes">
-                <div class="panel-heading">
-                    <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-music"></span> iTunes Control</span></h3>
-                </div>
-                <div class="panel-body">
-                    <p><small id="iTunes_Title">Filename of file playing</small></p>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <button type="button" id="iTunes_PlayPause" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-play"></span> Play
-                            </button>
-                        </div>
-                        <div class="col-xs-2">
-                            <button type="button" id="iTunes_Stop" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-stop"></span> Stop
-                            </button>
-                        </div>
-                        <div class="col-xs-2">
-                            <button type="button" id="iTunes_VolumeUp" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-volume-up"></span> Vol.Up
-                            </button>
-                        </div>
-                        <div class="col-xs-2">
-                            <button type="button" id="iTunes_VolumeDown" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-volume-down"></span> Vol.Down
-                            </button>
-                        </div>
-                        <div class="col-xs-3">
-                            <button type="button" id="iTunes_OpenClose" class="btn btn-primary btn-lg btn-block">
-                            <span class="glyphicon glyphicon-off"></span> Open
-                            </button>
-                        </div>
+                <div class="panel panel-default tab-pane active" id="Player_MPC">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-film"></span> Media Player Control</span></h3>
                     </div>
+                    <div class="panel-body">
 
+                        <small id="mpc_filename">No video playing</small>
+
+                        <div class="progress progress-striped" id="MPCBar_Base">
+                            <div class="progress-bar" id="MPCBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <button type="button" id="MPC_PlayPause" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-play"></span> Play
+                                </button>
+                            </div>
+                            <div class="col-xs-2">
+                                <button type="button" id="MPC_Stop" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-stop"></span> Stop
+                                </button>
+                            </div>
+                            <div class="col-xs-2">
+                                <button type="button" id="MPC_VolumeUp" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-volume-up"></span> Vol.Up
+                                </button>
+                            </div>
+                            <div class="col-xs-2">
+                                <button type="button" id="MPC_VolumeDown" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-volume-down"></span> Vol.Down
+                                </button>
+                            </div>
+                            <div class="col-xs-3">
+                                <button type="button" id="MPC_Fullscreen" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-fullscreen"></span> Fullscreen
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
+
+                <div class="panel panel-default tab-pane active" id="Player_iTunes">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-music"></span> iTunes Control</span></h3>
+                    </div>
+                    <div class="panel-body">
+                        <p><small id="iTunes_Title">No music playing</small></p>
+                        <div class="row" id="iTunes_Grid">
+                            <div class="col-xs-3">
+                                <button type="button" id="iTunes_PlayPause" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-play"></span> Play
+                                </button>
+                            </div>
+                            <div class="col-xs-2">
+                                <button type="button" id="iTunes_Stop" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-stop"></span> Stop
+                                </button>
+                            </div>
+                            <div class="col-xs-2">
+                                <button type="button" id="iTunes_VolumeUp" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-volume-up"></span> Vol.Up
+                                </button>
+                            </div>
+                            <div class="col-xs-2">
+                                <button type="button" id="iTunes_VolumeDown" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-volume-down"></span> Vol.Down
+                                </button>
+                            </div>
+                            <div class="col-xs-3">
+                                <button type="button" id="iTunes_OpenClose" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-off"></span> Open
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>            
             </div>
+            <!-- TAB PANE END -->
 
             <div class="panel panel-default">
                 <div class="panel-body">
@@ -308,11 +339,21 @@
             <!-- .noUIslider Slider -->
             <script src="js/jquery.nouislider.min.js"></script>
             <script src="js/modernizr.js"></script>                
+            <script src="js/tab.js"></script>
 
             <script>
             $(function() {
 
-                // Run noUiSlider
+                //Show all panels if Main tab clicked
+                $('#homeTab a').click(function (e) {
+                    if ($(this).text() == "Main") {
+                        $('#Controller_Light').addClass('active');
+                        $('#Player_MPC').addClass('active');
+                        $('#Player_iTunes').addClass('active');
+                    }
+                })
+
+                //noUiSlider Events
                 $('.noUiSlider').noUiSlider({
                     range: [0, 100]
                     ,start: 0
