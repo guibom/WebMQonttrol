@@ -20,7 +20,7 @@ char message_buff[100];
 #define STR_L1_BRIGHTNESS "home/light/1/status/brightness"
 
 // Update these with values suitable for your network.
-byte mac[]    = { 0x11, 0x11, 0x11, 0x66, 0x66, 0x66 };
+byte mac[]    = { 0x00, 0x00, 0x10, 0x66, 0x66, 0x66 };
 byte server[] = { 192, 168, 0, 175 };
 byte ip[]     = { 192, 168, 0, 20 };
 
