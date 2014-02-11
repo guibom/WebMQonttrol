@@ -11,6 +11,7 @@
 
     <!-- Bootstrap and Bootstrap-Slider CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/weather-icons.min.css" rel="stylesheet">
     <link href="css/jquery.nouislider.min.css" rel="stylesheet">
     <style>
         .label {
@@ -203,7 +204,7 @@
                 {topic: 'home/player/mpc/status/#'},
                 {topic: 'home/player/itunes'}, 
                 {topic: 'home/player/itunes/status/#'},
-                {topic: 'home/web/config/#'}
+                {topic: 'home/web/config/#'}                
                 );
         });
     </script>
@@ -215,11 +216,13 @@
 
             <div class="panel panel-default" style="border-radius: 0px; border: 0px; box-shadow: 0px 0px 0px 0px; margin-bottom: 0px">
                 <div class="panel-body" style="border-radius: 0px; ">
-                    <ul class="nav nav-tabs" id="homeTab">
-                      <li class="active"><a href="#TabShowAll" data-toggle="tab">Main</a></li>
-                      <li><a href="#Controller_Light" data-toggle="tab">Light</a></li>
-                      <li><a href="#Player_MPC" data-toggle="tab">MPC</a></li>
-                      <li><a href="#Player_iTunes" data-toggle="tab">iTunes</a></li>                  
+                    <ul class="nav nav-tabs nav-justified" id="homeTab">
+                      <li class="active"><a href="#TabShowAll" data-toggle="tab"><span class="glyphicon glyphicon-home"></span> Main</a></li>
+                      <li><a href="#Controller_Light" data-toggle="tab"><span class="glyphicon glyphicon-flash"></span> Light</a></li>
+                      <li><a href="#Player_MPC" data-toggle="tab"><span class="glyphicon glyphicon-film"></span> MPC</a></li>
+                      <li><a href="#Player_iTunes" data-toggle="tab"><span class="glyphicon glyphicon-music"></span> iTunes</a></li>
+                      <li><a href="#Controller_PC" data-toggle="tab"><span class="glyphicon glyphicon-hdd"></span> PC</a></li>
+                      <li><a href="#Status_Weather" data-toggle="tab"><i class="wi-horizon-alt"></i> Weather</a></li>                      
                     </ul>              
                 </div>  
             </div>
@@ -231,10 +234,10 @@
                     <div class="panel-heading">
                         <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px">
                         <div class="row">
                             <div class="col-xs-4" >
-                                <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">Light Corner</span></h2>
+                                <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">Sofa light</span></h2>
                             </div>
                             <div class="col-xs-1">
                                 <h2><span id="Light_1_Brightness" class="label label-default" style="vertical-align:top; display: block;">N/A</span></h2>
@@ -243,6 +246,17 @@
                                 <div class="noUiSlider" id="slider1"></div>                            
                             </div>
                             <div class="col-xs-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
+                            </div>
+                        </div>                    
+                    </div>
+
+                    <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px">
+                        <div class="row">
+                            <div class="col-xs-5" >
+                                <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">TV light</span></h2>
+                            </div>
+                            <div class="col-xs-5"></div>
+                            <div class="col-xs-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_2" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
                             </div>
                         </div>                    
                     </div>
@@ -346,7 +360,7 @@
 
                 //Show all panels if Main tab clicked
                 $('#homeTab a').click(function (e) {
-                    if ($(this).text() == "Main") {
+                    if ($.trim($(this).text()) == "Main") {
                         $('#Controller_Light').addClass('active');
                         $('#Player_MPC').addClass('active');
                         $('#Player_iTunes').addClass('active');
