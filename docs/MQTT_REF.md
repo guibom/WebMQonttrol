@@ -62,3 +62,12 @@ home/light/#/config/fade_speed	(int in seconds)
 
 home/web/config/debug_show      (1,0)
 ```
+
+### External Messages
+Messages acquired from external sources
+```
+weather/home/currently/temperature          (int) 5min intervals
+weather/home/currently/apparenttemperature  (int) 5min intervals
+weather/home/currently/summary              (string) 5min intervals
+weather/home/currently/icon                 (forecast.io icons) 5min intervals
+```
