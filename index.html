@@ -31,7 +31,7 @@
         var socket = io.connect('http://192.168.0.175:3000');
 
         //Global variables
-        var debug_show = false;  //If it's on, no panels will be hidden          
+        var debug_show = true;  //If it's on, no panels will be hidden          
         var msg; //global msg variable
 
         //Object for Light messages
@@ -271,9 +271,8 @@
 
                 //Forward topic to the right object
                 $.each(masterPanel, function(key, obj) {
-                    if (obj[msg.topic]) {         
-                        obj[msg.topic]();
-                    }                        
+                    if (obj[msg.topic])        
+                        obj[msg.topic]();                   
                 });
                
                 //Preview of MQTT message
@@ -300,9 +299,11 @@
     <div id="wrap">
         <div class="container">
 
+            <div id="alertWindow"></div>
+
             <div class="panel panel-default" style="border-radius: 0px; border: 0px; box-shadow: 0px 0px 0px 0px; margin-bottom: 0px">
                 <div class="panel-body" style="border-radius: 0px; ">
-                    <ul class="nav nav-tabs nav-justified" id="homeTab">
+                    <ul class="nav nav-tabs nav-justified" id="topTab">
                       <li class="active"><a href="#TabShowAll" data-toggle="tab"><span class="glyphicon glyphicon-home"></span> Main</a></li>
                       <li><a href="#Controller_Light" data-toggle="tab"><span class="glyphicon glyphicon-flash"></span> Light</a></li>
                       <li><a href="#Player_MPC" data-toggle="tab"><span class="glyphicon glyphicon-film"></span> MPC</a></li>
@@ -318,31 +319,30 @@
 
                 <div class="tab-pane panel panel-default active" id="Controller_Light">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>
+                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>                        
                     </div>
                     <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px">
                         <div class="row">
-                            <div class="col-xs-4" >
+                            <div class="col-sm-4">
                                 <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">Sofa light</span></h2>
                             </div>
-                            <div class="col-xs-1">
+                            <div class="col-sm-1 col-xs-2">
                                 <h2><span id="Light_1_Brightness" class="label label-default" style="vertical-align:top; display: block;">N/A</span></h2>
                             </div>
-                            <div class="col-xs-5" style="text-align:center; padding-top: 28px; padding-left: 20px; padding-right: 20px">                            
+                            <div class="col-sm-5 col-xs-6" style="text-align:center; padding-top: 28px; padding-left: 20px; padding-right: 20px">                            
                                 <div class="noUiSlider" id="slider1"></div>                            
                             </div>
-                            <div class="col-xs-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
+                            <div class="col-sm-2 col-xs-4" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
                             </div>
                         </div>                    
                     </div>
 
                     <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px">
                         <div class="row">
-                            <div class="col-xs-5" >
+                            <div class="col-sm-10" >
                                 <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">TV light</span></h2>
                             </div>
-                            <div class="col-xs-5"></div>
-                            <div class="col-xs-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_2" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
+                            <div class="col-sm-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_2" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
                             </div>
                         </div>                    
                     </div>
@@ -361,27 +361,27 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-xs-3">
+                            <div class="col-sm-3">
                                 <button type="button" id="MPC_PlayPause" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-play"></span> Play
                                 </button>
                             </div>
-                            <div class="col-xs-2">
+                            <div class="col-sm-2">
                                 <button type="button" id="MPC_Stop" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-stop"></span> Stop
                                 </button>
                             </div>
-                            <div class="col-xs-2">
+                            <div class="col-sm-2">
                                 <button type="button" id="MPC_VolumeUp" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-volume-up"></span> Vol.Up
                                 </button>
                             </div>
-                            <div class="col-xs-2">
+                            <div class="col-sm-2">
                                 <button type="button" id="MPC_VolumeDown" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-volume-down"></span> Vol.Down
                                 </button>
                             </div>
-                            <div class="col-xs-3">
+                            <div class="col-sm-3">
                                 <button type="button" id="MPC_Fullscreen" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-fullscreen"></span> Fullscreen
                                 </button>
@@ -448,14 +448,22 @@
             <script>
             $(function() {
 
+                //Check if we have a valid websocket connection
+                socket.on('error', function () {
+                    console.log("Couldn't connect to the web socket!");
+                    $("#alertWindow").html('<div class="alert alert-danger">Could not connect to the web socket server!</div>');
+                })
+
+
                 //Show all panels if Main tab clicked
-                $('#homeTab a').click(function (e) {
+                $('#topTab a').click(function (e) {
                     if ($.trim($(this).text()) == "Main") {
                         $('#Controller_Light').addClass('active');
                         $('#Player_MPC').addClass('active');
                         $('#Player_iTunes').addClass('active');
                     }
                 });
+
 
                 //Movie file selected
                 $(document).on('click', '.list-group-item', function(){
@@ -485,7 +493,7 @@
 
 
                 //Button event handler. Redirects to the appropriate function 
-                $('.btn').click(function () {
+                $(".btn").click(function () {
                     //Get type of button from the start of the ID
                     var id_type = this.id.split("_");
                     var clicked_obj = $(this);
@@ -496,6 +504,53 @@
                         }                        
                     });
                 });
+
+                //Find the current page size, and tweak accordingly
+                tweakPageForEnvironment(findBootstrapEnvironment());
+
+                //Special tweaks for different page sizes
+                function tweakPageForEnvironment(env) {
+                    switch (env) {
+
+                        case "ExtraSmall":
+                            //Remove icons from tab menu
+                            $.each($("#topTab").find("a").contents(), function(key, obj) {                                        
+                                if ($(obj)[0].nodeName == "#text")
+                                    obj.data = "";
+                            });
+                            //Remove justified from tab menu
+                            $("#topTab").removeClass("nav-justified");
+                            //Remove every button
+                            // $(".btn").contents().filter(function(){
+                            //     return this.nodeType === 3;                    
+                            // }).remove();
+                    }
+                }
+
+
+                //Tweak page based on the screen resolution
+                function findBootstrapEnvironment() {
+                    var envs = ["ExtraSmall", "Small", "Medium", "Large"];
+                    var envValues = ["xs", "sm", "md", "lg"];
+
+                    $el = $('<div>');
+                    $el.appendTo($('body'));
+
+                    for (var i = envValues.length - 1; i >= 0; i--) {
+                        var envVal = envValues[i];
+
+                        $el.addClass('hidden-'+envVal);
+                        if ($el.is(':hidden')) {
+                            $el.remove();
+                            return envs[i]
+                        }
+                    };
+                }
+
+                // $(window).resize(function () {
+                //     //console.log($(document).width());
+                //     console.log(findBootstrapEnvironment());
+                // });
               
             });
             </script>
