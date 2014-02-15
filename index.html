@@ -18,7 +18,7 @@
           padding: .2em .2em .3em;
         }
         .row {margin:  -7.5px}
-        [class*="col-"] {padding: 0 5px;}
+        [class*="col-"] {padding: 2px 5px;}
     </style>
 
     <!-- jQuery -->
@@ -26,175 +26,259 @@
     <!-- socket.io for communication -->
     <script type="text/javascript" src="js/socket.io.min.js"></script>
     <script type="text/javascript">
+
         //Connect to socket and MQTT broker
         var socket = io.connect('http://192.168.0.175:3000');
 
         //Global variables
-        var debug_show = false;  //If it's on, no panels will be hidden
-        var msgMPC, msgLight, msgiTunes;  //Objects that hold the topic subscriptions and other values for that panel
+        var debug_show = false;  //If it's on, no panels will be hidden          
+        var msg; //global msg variable
 
+        //Object for Light messages
+        var panelLight = {
+            //Properties
+            type: "Light",
+
+            "home/light/1/status": function() {
+                if (msg.payload == 'on') {
+                    $('#Light_1').html('<span class="glyphicon glyphicon-ok"></span> ON');                        
+                    $('#Light_1').removeClass('btn-danger').addClass('btn-success');
+                } else {
+                    $('#Light_1').html('<span class="glyphicon glyphicon-remove"></span> OFF');   
+                    $('#Light_1').removeClass('btn-success').addClass('btn-danger');
+                }
+            },
+
+            "home/light/1/status/brightness": function() {
+                $('#Light_1_Brightness').text(msg.payload);
+                $('#slider1').val(parseInt(msg.payload));
+            },
+
+            Control: function(controller) {
+                //Get light number from jquery object's id
+                var light_id = controller.attr("id").split("_");
+                light_id = light_id[1];
+                var current_status = $.trim($(controller).text().toLowerCase());
+                var send_msg;
+
+                //Toggle light status message
+                if (current_status == "on") {
+                    send_msg = "off";                            
+                } else if (current_status == "off") {
+                    send_msg = "on";                             
+                }                            
+
+                //Publish MQTT message
+                socket.emit('publish', {
+                    topic: 'home/light/' + light_id + '/' + send_msg,
+                    message: '1'
+                });
+            }
+        }
+
+        //Object for iTunes messages
+        var paneliTunes = {
+            //Default values
+            type: "iTunes",
+            actionMessage: "home/player/itunes/",
+            
+            "home/player/itunes/status/playing": function() {
+                if (msg.payload == '1') {                            
+                    $("#iTunes_PlayPause").html('<span class="glyphicon glyphicon-pause"></span> Pause'); 
+                    $("#iTunes_PlayPause").addClass('btn-warning').removeClass('btn-primary')
+                } else {
+                    $("#iTunes_PlayPause").html('<span class="glyphicon glyphicon-play"></span> Play');
+                    $("#iTunes_PlayPause").addClass('btn-primary').removeClass('btn-warning')
+                }
+            },
+
+            "home/player/itunes": function() {
+                if (msg.payload == 'on') {                            
+                    $("#iTunes_OpenClose").html('<span class="glyphicon glyphicon-off"></span> Close'); 
+                    $("#iTunes_OpenClose").addClass('btn-warning').removeClass('btn-primary')
+                    //Show title text element
+                    $('#iTunes_Title').removeClass('hide');
+
+                    //Enable all the buttons
+                    $('#iTunes_Grid').find("button").each(function(index, element){
+                        $(this).removeClass('disabled');
+                    });
+
+                } else {
+                    $("#iTunes_OpenClose").html('<span class="glyphicon glyphicon-off"></span> Open');
+                    $("#iTunes_OpenClose").addClass('btn-primary').removeClass('btn-warning')
+                    //Hide title text element
+                    $('#iTunes_Title').addClass('hide');
+
+                    //Disable all the buttons. 
+                    $('#iTunes_Grid').find("button").each(function(index, element){
+                        $(this).addClass('disabled');
+                    });
+                    //Re-enable OpenClose button, since it works without iTunes open.
+                    $('#iTunes_OpenClose').removeClass('disabled')
+                }
+            },
+
+            "home/player/itunes/status/title": function() {
+                if (msg.payload != "" && msg.payload != "0") {
+                    $('#iTunes_Title').html(msg.payload); 
+                } else {
+                    $('#iTunes_Title').html('Title not found'); 
+                }
+            },
+
+            Control: function(controller) {
+                //Second part of MPC_xxx, lowercased is the MQTT message
+                var action = controller.attr("id").split("_");
+                action = action[1].toLowerCase();
+
+                socket.emit('publish', {
+                    topic: this.actionMessage + action,
+                    message: '1'
+                });
+            }
+        }
+
+        //Object for MPC messages
+        var panelMPC = {
+            //Default values
+            type: "MPC",
+            actionMessage: "home/player/mpc/",
+            MPCBarTotal: 0,
+
+            "home/player/mpc": function() {                    
+                if (msg.payload == 'on' || debug_show) {
+                    $('#Player_MPC').removeClass('hide');
+                } else {
+                    $('#Player_MPC').addClass('hide');
+                }
+            },
+
+            "home/player/mpc/status/total_time": function() {
+                MPCBarTotal = msg.payload;                        
+            },
+
+            "home/player/mpc/status/current_time": function() {                        
+                var current_time = parseInt(msg.payload);                        
+                document.getElementById('MPCBar').style.width = ((current_time * 100) / MPCBarTotal) + '%';
+            },
+
+            "home/player/mpc/status/playing": function() {
+                //Playing
+                if (msg.payload == '1') {
+                    $('#MPCBar').removeClass('hide')
+                    $('#MPCBar_Base').addClass('active');
+
+                    $("#MPC_PlayPause").html('<span class="glyphicon glyphicon-pause"></span> Pause'); 
+                    $("#MPC_PlayPause").addClass('btn-warning').removeClass('btn-primary')
+                //Paused
+                } else if (msg.payload == "2") {
+                    $('#MPCBar').removeClass('hide');
+                    $('#MPCBar_Base').removeClass('active');
+
+                    $("#MPC_PlayPause").html('<span class="glyphicon glyphicon-play"></span> Play');
+                    $("#MPC_PlayPause").addClass('btn-primary').removeClass('btn-warning')
+                //Stopped
+                } else {
+                    $('#MPCBar').addClass('hide');
+
+                    $("#MPC_PlayPause").html('<span class="glyphicon glyphicon-play"></span> Play');
+                    $("#MPC_PlayPause").addClass('btn-primary').removeClass('btn-warning')
+                }
+            },
+            
+            "home/player/mpc/status/filename": function() {
+                if (msg.payload != "" && msg.payload != "0") {
+                    $('#mpc_filename').html(msg.payload); 
+                } else {
+                    $('#mpc_filename').html('Filename not found'); 
+                }
+            },
+
+            Control: function(controller) {
+                //Second part of MPC_xxx, lowercased is the MQTT message
+                var action = controller.attr("id").split("_");
+                action = action[1].toLowerCase();
+
+                socket.emit('publish', {
+                    topic: this.actionMessage + action,
+                    message: '1'
+                });
+            }
+        }
+
+        //File selection to start a video in MPC
+        var panelMPCSelection = {
+            //Default values
+            requestMessage: "home/htpc/listfiles",
+            playFileMessage: "home/player/mpc/open",
+            extFilter: ["mkv", "mp4", "avi", "wmv"],
+            currentPath: "",
+
+            "home/htpc/listfiles/result": function() {
+                if (msg.payload) {
+                    var obj = jQuery.parseJSON(msg.payload);
+                    var extFilter = this.extFilter;    
+                    var myItems = [];
+                    var $myList = $("#MPC_File_List");
+                    
+                    //Iterate over each file object
+                    $.each( obj.files, function( key, value ) {
+                        //Check if the file matches the filtered extensions        
+                        $.each(extFilter, function(keyF, valueFilter) {
+                            if (valueFilter == value.split('.').pop()) {
+                                myItems.push( '<a href="#" class="list-group-item">' + value + '</a>' );
+                                return false;                                
+                            }
+                        });                        
+                    });
+
+                    //Iterate over the folders to add.
+                    $.each( obj.folders, function( key, value ) {  
+                        myItems.push( '<a href="#" class="list-group-item"><span class="glyphicon glyphicon-folder-open"></span>  ' + value + '</a>' );
+                    });
+
+                    //Path that was used on json query
+                    this.currentPath = obj.root;
+                     
+                    //Append all the HTML at once
+                    $myList.append( myItems.join( "" ) );                    
+                }                       
+            },
+
+            "Open": function(file) {
+
+                if(file){
+                    //Publish MQTT message
+                    socket.emit('publish', {
+                        topic: this.playFileMessage,
+                        message: this.currentPath + "/" + file
+                    });
+                    console.log("Published ", this.currentPath + "/" + file);
+                }                
+            }
+        }
+
+        //Objects that hold the topic subscriptions and other values for that panel
+        var masterPanel = [panelMPC, panelLight, paneliTunes, panelMPCSelection];
+
+        //Create web socket and start listening for MQTT messages       
         socket.on('connect', function () {
-            socket.on('mqtt', function (msg) {
+            socket.on('mqtt', function (lastmsg) {
 
-                //Object for Light messages
-                msgLight = {
+                //Save lastmsg
+                msg = lastmsg;
 
-                    "home/light/1/status": function() {
-                        if (msg.payload == 'on') {
-                            $('#Light_1').html('<span class="glyphicon glyphicon-ok"></span> ON');                        
-                            $('#Light_1').removeClass('btn-danger').addClass('btn-success');
-                        } else {
-                            $('#Light_1').html('<span class="glyphicon glyphicon-remove"></span> OFF');   
-                            $('#Light_1').removeClass('btn-success').addClass('btn-danger');
-                        }
-                    },
-
-                    "home/light/1/status/brightness": function() {
-                        $('#Light_1_Brightness').text(msg.payload);
-                        $('#slider1').val(parseInt(msg.payload));
-                    },
-
-                    Control: function(controller) {
-                        //Get light number from jquery object's id
-                        var light_id = controller.attr("id").split("_");
-                        light_id = light_id[1];
-                        var current_status = $.trim($(controller).text().toLowerCase());
-                        var send_msg;
-
-                        //Toggle light status message
-                        if (current_status == "on") {
-                            send_msg = "off";                            
-                        } else if (current_status == "off") {
-                            send_msg = "on";                             
-                        }                            
-
-                        //Publish MQTT message
-                        socket.emit('publish', {
-                            topic: 'home/light/' + light_id + '/' + send_msg,
-                            message: '1'
-                        });
-                    }
-                }
-
-                //Object for iTunes messages
-                msgiTunes = {
-                    //Default values
-                    actionPath: "home/player/itunes/",
-                    
-                    "home/player/itunes/status/playing": function() {
-                        if (msg.payload == '1') {                            
-                            $("#iTunes_PlayPause").html('<span class="glyphicon glyphicon-pause"></span> Pause'); 
-                            $("#iTunes_PlayPause").addClass('btn-warning').removeClass('btn-primary')
-                        } else {
-                            $("#iTunes_PlayPause").html('<span class="glyphicon glyphicon-play"></span> Play');
-                            $("#iTunes_PlayPause").addClass('btn-primary').removeClass('btn-warning')
-                        }
-                    },
-
-                    "home/player/itunes": function() {
-                        if (msg.payload == 'on') {                            
-                            $("#iTunes_OpenClose").html('<span class="glyphicon glyphicon-off"></span> Close'); 
-                            $("#iTunes_OpenClose").addClass('btn-warning').removeClass('btn-primary')
-                            //Show title text element
-                            $('#iTunes_Title').removeClass('hide');
-
-                            //Enable all the buttons
-                            $('#iTunes_Grid').find("button").each(function(index, element){
-                                $(this).removeClass('disabled');
-                            });
-
-                        } else {
-                            $("#iTunes_OpenClose").html('<span class="glyphicon glyphicon-off"></span> Open');
-                            $("#iTunes_OpenClose").addClass('btn-primary').removeClass('btn-warning')
-                            //Hide title text element
-                            $('#iTunes_Title').addClass('hide');
-
-                            //Disable all the buttons. 
-                            $('#iTunes_Grid').find("button").each(function(index, element){
-                                $(this).addClass('disabled');
-                            });
-                            //Re-enable OpenClose button, since it works without iTunes open.
-                            $('#iTunes_OpenClose').removeClass('disabled')
-                        }
-                    },
-
-                    "home/player/itunes/status/title": function() {
-                        if (msg.payload != "" && msg.payload != "0") {
-                            $('#iTunes_Title').html(msg.payload); 
-                        } else {
-                            $('#iTunes_Title').html('Title not found'); 
-                        }
-                    }
-                }
-
-                //Object for MPC messages
-                msgMPC = {
-                    //Default values
-                    actionPath: "home/player/mpc/",
-                    MPCBarTotal: 0,
-
-                    "home/player/mpc": function() {
-                        if (msg.payload == 'on' || debug_show) {
-                            $('#Player_MPC').removeClass('hide');
-                        } else {
-                            $('#Player_MPC').addClass('hide');
-                        }
-                    },
-
-                    "home/player/mpc/status/total_time": function() {
-                        MPCBarTotal = msg.payload;                        
-                    },
-
-                    "home/player/mpc/status/current_time": function() {
-                        var current_time = parseInt(msg.payload);                        
-                        document.getElementById('MPCBar').style.width = ((current_time * 100) / MPCBarTotal) + '%';
-                    },
-
-                    "home/player/mpc/status/playing": function() {
-                        //Playing
-                        if (msg.payload == '1') {
-                            $('#MPCBar').removeClass('hide')
-                            $('#MPCBar_Base').addClass('active');
-
-                            $("#MPC_PlayPause").html('<span class="glyphicon glyphicon-pause"></span> Pause'); 
-                            $("#MPC_PlayPause").addClass('btn-warning').removeClass('btn-primary')
-                        //Paused
-                        } else if (msg.payload == "2") {
-                            $('#MPCBar').removeClass('hide');
-                            $('#MPCBar_Base').removeClass('active');
-
-                            $("#MPC_PlayPause").html('<span class="glyphicon glyphicon-play"></span> Play');
-                            $("#MPC_PlayPause").addClass('btn-primary').removeClass('btn-warning')
-                        //Stopped
-                        } else {
-                            $('#MPCBar').addClass('hide');
-
-                            $("#MPC_PlayPause").html('<span class="glyphicon glyphicon-play"></span> Play');
-                            $("#MPC_PlayPause").addClass('btn-primary').removeClass('btn-warning')
-                        }
-                    },
-                    
-                    "home/player/mpc/status/filename": function() {
-                        if (msg.payload != "" && msg.payload != "0") {
-                            $('#mpc_filename').html(msg.payload); 
-                        } else {
-                            $('#mpc_filename').html('Filename not found'); 
-                        }
-                    }
-                }
-               
                 //Forward topic to the right object
-                if ( msgiTunes[msg.topic] ) {
-                    msgiTunes[msg.topic]();
-                } else if (msgLight[msg.topic]) {
-                    msgLight[msg.topic]();
-                } else if (msgMPC[msg.topic]) {
-                    msgMPC[msg.topic]();
-                }
+                $.each(masterPanel, function(key, obj) {
+                    if (obj[msg.topic]) {         
+                        obj[msg.topic]();
+                    }                        
+                });
                
-                //Status messages                   
-                $('#message').html(msg.topic + ', ' + msg.payload);
-
+                //Preview of MQTT message
+                $('#message').html(msg.topic + ', ' + msg.payload.substring(0, 100));
+              
             });
 
             //Topic subscriptions
@@ -204,7 +288,9 @@
                 {topic: 'home/player/mpc/status/#'},
                 {topic: 'home/player/itunes'}, 
                 {topic: 'home/player/itunes/status/#'},
-                {topic: 'home/web/config/#'}                
+                {topic: 'home/web/config/#'},
+                {topic: 'home/htpc/#'}
+
                 );
         });
     </script>
@@ -222,7 +308,7 @@
                       <li><a href="#Player_MPC" data-toggle="tab"><span class="glyphicon glyphicon-film"></span> MPC</a></li>
                       <li><a href="#Player_iTunes" data-toggle="tab"><span class="glyphicon glyphicon-music"></span> iTunes</a></li>
                       <li><a href="#Controller_PC" data-toggle="tab"><span class="glyphicon glyphicon-hdd"></span> PC</a></li>
-                      <li><a href="#Status_Weather" data-toggle="tab"><i class="wi-horizon-alt"></i> Weather</a></li>                      
+                      <li><a href="#Status_Weather" data-toggle="tab"><i class="wi-horizon-alt"></i> Weather</a></li>
                     </ul>              
                 </div>  
             </div>
@@ -312,27 +398,27 @@
                     <div class="panel-body">
                         <p><small id="iTunes_Title">No music playing</small></p>
                         <div class="row" id="iTunes_Grid">
-                            <div class="col-xs-3">
+                            <div class="col-sm-3">
                                 <button type="button" id="iTunes_PlayPause" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-play"></span> Play
                                 </button>
                             </div>
-                            <div class="col-xs-2">
+                            <div class="col-sm-2">
                                 <button type="button" id="iTunes_Stop" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-stop"></span> Stop
                                 </button>
                             </div>
-                            <div class="col-xs-2">
+                            <div class="col-sm-2">
                                 <button type="button" id="iTunes_VolumeUp" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-volume-up"></span> Vol.Up
                                 </button>
                             </div>
-                            <div class="col-xs-2">
+                            <div class="col-sm-2">
                                 <button type="button" id="iTunes_VolumeDown" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-volume-down"></span> Vol.Down
                                 </button>
                             </div>
-                            <div class="col-xs-3">
+                            <div class="col-sm-3">
                                 <button type="button" id="iTunes_OpenClose" class="btn btn-primary btn-lg btn-block">
                                 <span class="glyphicon glyphicon-off"></span> Open
                                 </button>
@@ -343,6 +429,9 @@
                 </div>            
             </div>
             <!-- TAB PANE END -->
+            
+            <div class="list-group" id="MPC_File_List">
+            </div>
 
             <div class="panel panel-default">
                 <div class="panel-body">
@@ -354,7 +443,8 @@
             <script src="js/jquery.nouislider.min.js"></script>
             <script src="js/modernizr.js"></script>                
             <script src="js/tab.js"></script>
-
+            
+            <!-- Event handler scripts -->
             <script>
             $(function() {
 
@@ -365,8 +455,14 @@
                         $('#Player_MPC').addClass('active');
                         $('#Player_iTunes').addClass('active');
                     }
-                })
+                });
 
+                //Movie file selected
+                $(document).on('click', '.list-group-item', function(){
+                    panelMPCSelection.Open($.trim($(this).text()));
+                });
+
+          
                 //noUiSlider Events
                 $('.noUiSlider').noUiSlider({
                     range: [0, 100]
@@ -392,34 +488,14 @@
                 $('.btn').click(function () {
                     //Get type of button from the start of the ID
                     var id_type = this.id.split("_");
+                    var clicked_obj = $(this);
 
-                    switch (id_type[0]) {
-
-                        case 'MPC':
-                            SendControlMSG(msgMPC, $(this));
-                            break;                                        
-
-                        case 'iTunes':
-                            SendControlMSG(msgiTunes, $(this));
-                            break;
-
-                        case 'Light':
-                            msgLight.Control($(this));
-                            break; 
-                    }
-                });
-
-                //Send MPC control message, based on element ID
-                function SendControlMSG(type, controller) {
-                    //Second part of MPC_xxx, lowercased is the MQTT message
-                    var action = controller.attr("id").split("_");
-                    action = action[1].toLowerCase();
-
-                    socket.emit('publish', {
-                        topic: type.actionPath + action,
-                        message: '1'
+                    $.each(masterPanel, function(key, obj) {
+                        if (obj.type == id_type[0]) {
+                            obj.Control(clicked_obj);
+                        }                        
                     });
-                }
+                });
               
             });
             </script>
