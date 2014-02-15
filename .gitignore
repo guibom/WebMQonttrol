@@ -1,2 +1,4 @@
 Thumbs.db
 *.pyc
+*.sublime*
+node_modules/
