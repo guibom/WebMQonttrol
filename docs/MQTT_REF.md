@@ -9,18 +9,18 @@ home/player/mpc					(on, off) Retained
 home/player/itunes				(on, off) Retained
 home/player/xbmc				(on, off) Retained
 
-home/pc                         (on, off) Retained
+home/htpc                       (on, off) Retained
 home/vault                      (on, off) Retained
 ```
 
 ### Action Messages
 Actions are received by other clients, and are usually just a trigger event
 ```
-home/light/#/on  				(1)
-home/light/#/off  				(1)
-home/light/#/fade_on			(int speed mili)
-home/light/#/fade_off			(int speed mili)
-home/light/#/set 				(0-100) _Brightness Value_
+home/light/$ID/on  				(1)
+home/light/$ID/off  			(1)
+home/light/$ID/fade_on			(int speed mili)
+home/light/$ID/fade_off			(int speed mili)
+home/light/$ID/set 				(0-100) _Brightness Value_
 
 home/player/mpc/playpause		(1)
 home/player/mpc/stop			(1)
@@ -34,15 +34,16 @@ home/player/itunes/stop         (1)
 home/player/itunes/volumeup     (1)
 home/player/itunes/volumedown   (1)
 
-home/pc/sleep                   (1)
-home/pc/wakeup                  (1) WOL package from Node-Red
+home/htpc/sleep                 (1)
+home/htpc/wakeup                (1) WOL package from Node-Red
+home/htpc/listfiles             (string pathname)
 ```
 
 ### Status Messages
 Status updates are set by clients after actions are performed, usually persist
 ```
-home/light/#/status        		    (on, off) Read-only
-home/light/#/status/brightness      (0-100)	Read-only
+home/light/$ID/status        		(on, off) Read-only
+home/light/$ID/status/brightness    (0-100)	Read-only
 
 home/player/mpc/status/playing		(0 stopped, 1 playing, 2 paused) Retained
 home/player/mpc/status/total_time	(int in seconds)
@@ -56,9 +57,9 @@ home/player/itunes/status/title     (string, null or 0 for none)
 ### Configuration Messages
 Configuration values are used to tweak the clients, updating their default values
 ```
-home/light/#/config/min_value	(byte)
-home/light/#/config/max_value	(byte)
-home/light/#/config/fade_speed	(int in seconds)
+home/light/$ID/config/min_value	    (byte)
+home/light/$ID/config/max_value	    (byte)
+home/light/$ID/config/fade_speed	(int in seconds)
 
 home/web/config/debug_show      (1,0)
 ```
@@ -71,3 +72,15 @@ weather/home/currently/apparenttemperature  (int) 5min intervals
 weather/home/currently/summary              (string) 5min intervals
 weather/home/currently/icon                 (forecast.io icons) 5min intervals
 ```
+
+
+### Sensor Network
+Short-form messages transmitted by sensor network, and how they are processed into full proper messages by Node_RED
+```
+S/T/$ID (int)  -->  /sensor/temperature/$ID/raw/last    (int)
+S/H/$ID (int)  -->  /sensor/humidity/$ID/raw/last   (int)
+
+C/L/10/S        Controller/
+C/L/10/G
+C/L/10/F/U
+``` 
