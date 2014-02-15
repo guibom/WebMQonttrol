@@ -146,6 +146,10 @@
             actionMessage: "home/player/mpc/",
             MPCBarTotal: 0,
 
+            panelMPC: function() {
+                console.log("done");
+            },
+
             "home/player/mpc": function() {                    
                 if (msg.payload == 'on' || debug_show) {
                     $('#Player_MPC').removeClass('hide');
@@ -210,8 +214,10 @@
         //File selection to start a video in MPC
         var panelMPCSelection = {
             //Default values
-            requestMessage: "home/htpc/listfiles",
+            type: "MPCSelection",
+            requestMessage: "home/htpc",
             playFileMessage: "home/player/mpc/open",
+            startFolder: "c:/users/longinus/downloads",
             extFilter: ["mkv", "mp4", "avi", "wmv"],
             currentPath: "",
 
@@ -246,7 +252,7 @@
                 }                       
             },
 
-            "Open": function(file) {
+            Open: function(file) {
 
                 if(file){
                     //Publish MQTT message
@@ -256,6 +262,17 @@
                     });
                     console.log("Published ", this.currentPath + "/" + file);
                 }                
+            },
+
+            Control: function(controller) {
+                //Second part of MPC_xxx, lowercased is the MQTT message
+                var action = controller.attr("id").split("_");
+                action = action[1].toLowerCase();
+
+                socket.emit('publish', {
+                    topic: this.requestMessage + "/" + action,
+                    message: this.startFolder
+                });
             }
         }
 
@@ -326,10 +343,10 @@
                             <div class="col-sm-4">
                                 <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">Sofa light</span></h2>
                             </div>
-                            <div class="col-sm-1 col-xs-2">
+                            <div class="col-sm-1 col-xs-3">
                                 <h2><span id="Light_1_Brightness" class="label label-default" style="vertical-align:top; display: block;">N/A</span></h2>
                             </div>
-                            <div class="col-sm-5 col-xs-6" style="text-align:center; padding-top: 28px; padding-left: 20px; padding-right: 20px">                            
+                            <div class="col-sm-5 col-xs-5" style="text-align:center; padding-top: 28px; padding-left: 20px; padding-right: 20px">                            
                                 <div class="noUiSlider" id="slider1"></div>                            
                             </div>
                             <div class="col-sm-2 col-xs-4" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
@@ -387,7 +404,29 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
 
+                <div class="panel panel-default tab-pane active" id="Player_MPCSelection">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <button type="button" id="MPCSelection_ListFiles" class="btn btn-primary btn-md btn-block">
+                                <span class="glyphicon glyphicon-folder-close"></span> Open folder \Downloads\
+                                </button>
+                            </div>
+                            <div class="col-xs-3">
+                                <button type="button" id="MPCSelection_ListFiles" class="btn btn-primary btn-md btn-block">
+                                <span class="glyphicon glyphicon-folder-close"></span> Open folder E:\Watch\
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="list-group" id="MPC_File_List">
+                                </div>
+                            </div>
+                        </div>                        
                     </div>
                 </div>
 
@@ -429,9 +468,7 @@
                 </div>            
             </div>
             <!-- TAB PANE END -->
-            
-            <div class="list-group" id="MPC_File_List">
-            </div>
+                        
 
             <div class="panel panel-default">
                 <div class="panel-body">
@@ -545,6 +582,24 @@
                             return envs[i]
                         }
                     };
+                }
+
+                //Takes an arbritary number of arguments and sanitize the topic with proper '/'.
+                function topicComposer(arg){                  
+                    var finalTopic = "";
+
+                    for (var i = 0; i < arguments.length; i++) {
+                        explodedTopic = arguments[i].split("/");
+
+                        $.each(explodedTopic, function(key, topicPart) {
+                            if (topicPart){
+                                finalTopic += topicPart + "/";
+                            }
+                        });
+                    }
+
+                    //Clears out the final /
+                    return finalTopic.substr(0,finalTopic.length-1);
                 }
 
                 // $(window).resize(function () {
