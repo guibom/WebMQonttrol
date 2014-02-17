@@ -19,7 +19,7 @@
           padding: .2em .2em .3em;
         }
         .row {margin:  -7.5px}
-        [class*="col-"] {padding: 2px 5px;}
+        [class*="col-"] {padding: 2px 4px;}
     </style>
 </head>
 
@@ -99,19 +99,29 @@
                                 <span class="glyphicon glyphicon-stop"></span> Stop
                                 </button>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-1">
                                 <button type="button" id="MPC_VolumeUp" class="btn btn-primary btn-lg btn-block">
-                                <span class="glyphicon glyphicon-volume-up"></span> Vol.Up
+                                <span class="glyphicon glyphicon-volume-up"></span>
                                 </button>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-1">
                                 <button type="button" id="MPC_VolumeDown" class="btn btn-primary btn-lg btn-block">
-                                <span class="glyphicon glyphicon-volume-down"></span> Vol.Down
+                                <span class="glyphicon glyphicon-volume-down"></span>
+                                </button>
+                            </div>
+                            <div class="col-sm-1">
+                                <button type="button" id="MPC_Mute" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-volume-off"></span>
+                                </button>
+                            </div>
+                            <div class="col-sm-1">
+                                <button type="button" id="MPC_Fullscreen" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-fullscreen"></span>
                                 </button>
                             </div>
                             <div class="col-sm-3">
-                                <button type="button" id="MPC_Fullscreen" class="btn btn-primary btn-lg btn-block">
-                                <span class="glyphicon glyphicon-fullscreen"></span> Fullscreen
+                                <button type="button" id="MPC_Close" class="btn btn-primary btn-lg btn-block">
+                                <span class="glyphicon glyphicon-off"></span> Close
                                 </button>
                             </div>
                         </div>
@@ -121,7 +131,7 @@
             <!-- START MPC Selection Panel -->
                 <div class="panel panel-default tab-pane Tab_Player_MPC" id="Player_MPCSelection">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-film"></span> MPC Play Video</span></h3>
+                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-film"></span> MPC Select Movie</span></h3>
                     </div>
 
                     <div class="panel-body">
@@ -224,7 +234,7 @@
             var socket = io.connect('http://192.168.0.175:3000');
 
             //Global variables
-            var debug_show = true;  //If it's on, no panels will be hidden          
+            var debug_show = false;  //If it's on, no panels will be hidden          
             var msg; //global msg variable
 
             //Object for Light messages
@@ -529,7 +539,6 @@
                         this.OpenFolder(this.pathHistory.pop()); //Now pass the right one
                     }
                 }
-
             }
 
             //Objects that hold the topic subscriptions and other values for that panel
