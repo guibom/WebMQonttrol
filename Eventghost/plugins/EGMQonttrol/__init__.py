@@ -36,9 +36,10 @@ class SendFileList(eg.ActionBase):
 
 	def __call__(self):
 		try:
-			path = eg.event.payload.split()[1]
+			path = eg.event.payload[2:]  #Used to remove first part of the payload
+
 			if (path):			
-				for (_, dirList, fileList) in walk(path):	
+				for (_, dirList, fileList) in walk(path):
 					break
 				
 				self.plugin.TriggerEvent("FileListCreated", json.dumps({'root':path, 'files':fileList, 'folders':dirList}))
