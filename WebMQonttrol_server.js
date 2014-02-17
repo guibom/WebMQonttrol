@@ -24,15 +24,17 @@ io.set('log level', 0)
 var debug_messages = false;
 
 //Enable debug messages from command line
-if (process.argv[2].toLowerCase() == "debug")
-    debug_messages = true;
+if (process.argv.length >= 2)
+    if (process.argv[2].toLowerCase() == "debug")
+        debug_messages = true;
+
+DEBUG_LOG('Server Started!');
 
 // Subscribe to topic
 io.sockets.on('connection', function (socket) {
+
     //Log subscriptions to console
-    if (debug_messages) {
-        console.log('Connected:', socket);
-    }  
+    DEBUG_LOG('Client Connected: ' + socket.id);
 
     //Subscribe to an arbitrary number of topics
     socket.on('subscribe', function (data) {        
@@ -49,14 +51,22 @@ io.sockets.on('connection', function (socket) {
     });
 
     //Publish to topic/message
-    socket.on('publish', function (data) {    	
+    socket.on('publish', function (data) {
+
+        //if (data.length < 2)
         //Log MQTT messages being sent
         if (debug_messages) {
             console.log('SENT:', data.topic, data.message);
         }
 
         //Publish MQTT message
-        mqttclient.publish(data.topic, data.message);
+        try {
+            mqttclient.publish(data.topic, data.message);    
+        }
+        catch(err) {
+            DEBUG_LOG('ERROR: ' + err, true);            
+        }
+        
     });
 
     //Unsubscribe from topic
@@ -79,3 +89,17 @@ mqttclient.on('message', function(topic, payload) {
     }        
 
 });
+
+
+//Print debug message to log, if server in debug mode
+function DEBUG_LOG(msg, force=false)
+{
+    if (debug_messages) {
+        console.log(msg);
+    }
+    else
+    {
+        if (force)
+            console.log(msg);
+    }
+}
