@@ -28,7 +28,6 @@ process.argv.forEach(function (val, index, array) {
     if (val) {
         if (val.toLowerCase() == "debug") {
             debug_messages = true;
-            io.set('log level', 1);
         }
     }  
 });
@@ -48,7 +47,15 @@ io.sockets.on('connection', function (socket) {
         for (var i = 0; i < arguments.length; i++) {
             
             try {
-                //Subscribe                
+
+                //Check topic for errors
+                if (typeof arguments[i].topic == 'undefined')
+                {
+                    DEBUG_LOG('Error, topic not valid! Ignoring function...');
+                    return false;
+                }
+
+                //Topic is not null, subscribe         
                 mqttclient.subscribe(arguments[i].topic);
                 //Log subscriptions to console
                 DEBUG_LOG('SUB: ' + arguments[i].topic);
@@ -63,9 +70,9 @@ io.sockets.on('connection', function (socket) {
     socket.on('publish', function (data) {
 
         //Check message
-        if (data.topic == false || data.message == false)
+        if (typeof data.topic == 'undefined')
         {
-            DEBUG_LOG('Error, topic/message is not valid!');
+            DEBUG_LOG('Error, topic not valid! Ignoring function...');
             return false;
         }
 
