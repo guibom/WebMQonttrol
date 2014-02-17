@@ -12,6 +12,7 @@
     <!-- Bootstrap and Bootstrap-Slider CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/weather-icons.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
     <link href="css/jquery.nouislider.min.css" rel="stylesheet">
     <style>
         .label {
@@ -25,26 +26,26 @@
 <body>
     <div id="wrap">
         <div class="container">
-
+            <!-- Shows error messages and other alerts -->
             <div id="alertWindow"></div>
 
             <div class="panel panel-default" style="border-radius: 0px; border: 0px; box-shadow: 0px 0px 0px 0px; margin-bottom: 0px">
                 <div class="panel-body" style="border-radius: 0px; ">
                     <ul class="nav nav-tabs nav-justified" id="topTab">
-                      <li class="active"><a href="#TabShowAll" data-toggle="tab"><span class="glyphicon glyphicon-home"></span> Main</a></li>
-                      <li><a href="#Controller_Light" data-toggle="tab"><span class="glyphicon glyphicon-flash"></span> Light</a></li>
-                      <li><a href="#Player_MPC" data-toggle="tab"><span class="glyphicon glyphicon-film"></span> MPC</a></li>
-                      <li><a href="#Player_iTunes" data-toggle="tab"><span class="glyphicon glyphicon-music"></span> iTunes</a></li>
-                      <li><a href="#Controller_PC" data-toggle="tab"><span class="glyphicon glyphicon-hdd"></span> PC</a></li>
-                      <li><a href="#Status_Weather" data-toggle="tab"><i class="wi-horizon-alt"></i> Weather</a></li>
+                      <li class="active"><a href="#" id="Tab_Main" class="tab_control"><span class="glyphicon glyphicon-home"></span> Main</a></li>
+                      <li><a href="#" id="Tab_Controller_Light" class="tab_control"><span class="glyphicon glyphicon-flash"></span> Light</a></li>
+                      <li><a href="#" id="Tab_Player_MPC" class="tab_control"><span class="glyphicon glyphicon-film"></span> MPC</a></li>
+                      <li><a href="#" id="Tab_Player_iTunes" class="tab_control"><span class="glyphicon glyphicon-music"></span> iTunes</a></li>
+                      <li><a href="#" id="Tab_Controller_PC" class="tab_control"><span class="glyphicon glyphicon-hdd"></span> PC</a></li>
+                      <li><a href="#" id="Tab_Status_Weather" class="tab_control"><i class="wi-horizon-alt"></i> Weather</a></li>
                     </ul>              
                 </div>  
             </div>
 
-            <!-- TAB PANE START -->
+        <!-- TAB PANE START -->
             <div class="tab-content">       
 
-                <div class="tab-pane panel panel-default active" id="Controller_Light">
+                <div class="tab-pane panel panel-default active Tab_Controller_Light Tab_Main" id="Controller_Light">
                     <div class="panel-heading">
                         <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>                        
                     </div>
@@ -75,7 +76,7 @@
                     </div>
                 </div>
 
-                <div class="panel panel-default tab-pane active" id="Player_MPC">
+                <div class="panel panel-default tab-pane active Tab_Player_MPC Tab_Main" id="Player_MPC">
                     <div class="panel-heading">
                         <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-film"></span> Media Player Control</span></h3>
                     </div>
@@ -117,30 +118,46 @@
                     </div>
                 </div>
 
-                <div class="panel panel-default tab-pane active" id="Player_MPCSelection">
+            <!-- START MPC Selection Panel -->
+                <div class="panel panel-default tab-pane Tab_Player_MPC" id="Player_MPCSelection">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-film"></span> MPC Play Video</span></h3>
+                    </div>
+
                     <div class="panel-body">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <button type="button" id="MPCSelection_ListFiles" class="btn btn-primary btn-md btn-block">
-                                <span class="glyphicon glyphicon-folder-close"></span> Open folder \Downloads\
-                                </button>
-                            </div>
-                            <div class="col-xs-3">
-                                <button type="button" id="MPCSelection_ListFiles" class="btn btn-primary btn-md btn-block">
-                                <span class="glyphicon glyphicon-folder-close"></span> Open folder E:\Watch\
-                                </button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <div class="list-group" id="MPC_File_List">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <button type="button" id="MPCSelection_BackFolder" class="btn btn-primary btn-md btn-block disabled click_ignore">
+                                        <i class="fa fa-folder-o fa-lg"></i> Back one folder
+                                        </button>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <button type="button" id="MPCSelection_ListFiles_1" class="btn btn-primary btn-md btn-block click_ignore">
+                                        <i class="fa fa-folder-o fa-lg"></i> Folder Downloads
+                                        </button>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <button type="button" id="MPCSelection_ListFiles_2" class="btn btn-primary btn-md btn-block click_ignore">
+                                        <i class="fa fa-folder-o fa-lg"></i> Folder E:\Watch
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>                        
+                        <!-- File Selection Panel -->
+                        <div class="panel panel-default" >
+                            <div class="panel-heading" id="MPCSelection_FolderText"><strong><i class="fa fa-folder-open fa-lg"></i> No Folder Selected</strong></div>
+                            <!-- List group -->
+                            <div class="list-group" id="MPC_File_List">
+                            </div>
+                        </div>
                     </div>
                 </div>
+            <!-- END MPC Selection Panel -->
 
-                <div class="panel panel-default tab-pane active" id="Player_iTunes">
+                <div class="panel panel-default tab-pane active Tab_Player_iTunes Tab_Controller_PC Tab_Status_Weather Tab_Main" id="Player_iTunes">
                     <div class="panel-heading">
                         <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-music"></span> iTunes Control</span></h3>
                     </div>
@@ -173,12 +190,11 @@
                                 </button>
                             </div>
                         </div>
-
                     </div>
-                </div>            
+                </div>
+
             </div>
-            <!-- TAB PANE END -->
-                        
+        <!-- TAB PANE END -->                        
 
             <div class="panel panel-default">
                 <div class="panel-body">
@@ -187,23 +203,22 @@
             </div>
 
 
-
     <!-- jQuery -->
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <!-- socket.io for communication -->
     <script type="text/javascript" src="js/socket.io.min.js"></script>
 
-
     <!-- .noUIslider Slider -->
     <script src="js/jquery.nouislider.min.js"></script>
-    <script src="js/modernizr.js"></script>                
     <script src="js/tab.js"></script>
+    <script src="js/modernizr.js"></script>
 
+    <!-- Utility Functions -->
+    <script src="js/WebMQonttrol.js"></script>
+    <!-- Main Script -->
+    <script>
 
-        <!-- Event handler scripts -->
-        <script>
-
-        $(function() {
+        $(function() {            
 
             //Connect to socket and MQTT broker
             var socket = io.connect('http://192.168.0.175:3000');
@@ -216,13 +231,14 @@
             var panelLight = {
                 //Properties
                 type: "Light",
+                $panel: $("#Controller_Light"),
 
                 "home/light/1/status": function() {
                     if (msg.payload == 'on') {
                         $('#Light_1').html('<span class="glyphicon glyphicon-ok"></span> ON');                        
                         $('#Light_1').removeClass('btn-danger').addClass('btn-success');
                     } else {
-                        $('#Light_1').html('<span class="glyphicon glyphicon-remove"></span> OFF');   
+                        $('#Light_1').html('<span class="glyphicon glyphicon-remove"></span> OFF');  
                         $('#Light_1').removeClass('btn-success').addClass('btn-danger');
                     }
                 },
@@ -232,7 +248,7 @@
                     $('#slider1').val(parseInt(msg.payload));
                 },
 
-                Control: function(controller) {
+                Click: function(controller) {
                     //Get light number from jquery object's id
                     var light_id = controller.attr("id").split("_");
                     light_id = light_id[1];
@@ -258,6 +274,7 @@
             var paneliTunes = {
                 //Default values
                 type: "iTunes",
+                $panel: $("#Player_iTunes"),
                 actionMessage: "home/player/itunes/",
                 
                 "home/player/itunes/status/playing": function() {
@@ -305,7 +322,7 @@
                     }
                 },
 
-                Control: function(controller) {
+                Click: function(controller) {
                     //Second part of MPC_xxx, lowercased is the MQTT message
                     var action = controller.attr("id").split("_");
                     action = action[1].toLowerCase();
@@ -321,23 +338,20 @@
             var panelMPC = {
                 //Default values
                 type: "MPC",
+                $panel: $("#Player_MPC"),
                 actionMessage: "home/player/mpc/",
                 MPCBarTotal: 0,
 
-                panelMPC: function() {
-                    console.log("done");
-                },
-
                 "home/player/mpc": function() {                    
-                    if (msg.payload == 'on' || debug_show) {
-                        $('#Player_MPC').removeClass('hide');
-                    } else {
-                        $('#Player_MPC').addClass('hide');
+                    if (msg.payload == 'on' || debug_show) {                        
+                        showPanel(this.$panel);
+                    } else {                    
+                        hidePanel(this.$panel);
                     }
                 },
 
                 "home/player/mpc/status/total_time": function() {
-                    MPCBarTotal = msg.payload;                        
+                    MPCBarTotal = msg.payload;                         
                 },
 
                 "home/player/mpc/status/current_time": function() {                        
@@ -377,7 +391,7 @@
                     }
                 },
 
-                Control: function(controller) {
+                Click: function(controller) {
                     //Second part of MPC_xxx, lowercased is the MQTT message
                     var action = controller.attr("id").split("_");
                     action = action[1].toLowerCase();
@@ -395,67 +409,141 @@
                 type: "MPCSelection",
                 requestMessage: "home/htpc",
                 playFileMessage: "home/player/mpc/open",
-                startFolder: "c:/users/longinus/downloads",
                 extFilter: ["mkv", "mp4", "avi", "wmv"],
                 currentPath: "",
+                pathHistory: [],
+
+                //Constructor, run once at start
+                __begin__: function(){
+
+                    //Set event handler for file selection buttons
+                    $("#MPCSelection_BackFolder").on("click", function(e) {
+                        e.preventDefault();
+                        panelMPCSelection.BackFolder();
+                    });
+
+                    $("#MPCSelection_ListFiles_1").on("click", function(e) {
+                        e.preventDefault();                        
+                        panelMPCSelection.OpenFolder("c:/users/longinus/downloads");
+                    });
+
+                    $("#MPCSelection_ListFiles_2").on("click", function(e) {
+                        e.preventDefault();
+                        panelMPCSelection.OpenFolder("E:/MOVE/_WATCH");
+                    });
+                    
+                },
 
                 "home/htpc/listfiles/result": function() {
                     if (msg.payload) {
-                        var obj = jQuery.parseJSON(msg.payload);
-                        var extFilter = this.extFilter;    
-                        var myItems = [];
+                        var obj = $.parseJSON(msg.payload);
+                        var extFilter = this.extFilter;                        
                         var $myList = $("#MPC_File_List");
                         
-                        //Iterate over each file object
+                        //Clear file list
+                        $myList.empty();
+
+                        //Iterate over the JSON object, finding files to add
                         $.each( obj.files, function( key, value ) {
-                            //Check if the file matches the filtered extensions        
+                            //Check if the file matches the filtered extensions
                             $.each(extFilter, function(keyF, valueFilter) {
-                                if (valueFilter == value.split('.').pop()) {
-                                    myItems.push( '<a href="#" class="list-group-item">' + value + '</a>' );
-                                    return false;                                
+                                if (valueFilter == value.split('.').pop()) {                                    
+                                    
+                                    //Create element
+                                    var $myNewElement = $('<a href="#" class="list-group-item"><i class="fa fa-file-o fa-fw"></i> ' + value + '</a>');
+
+                                    //Attach click event, with proper path to be used
+                                    $myNewElement.on( "click", function(e) {
+                                        e.preventDefault();
+                                        //Remove active from other list items
+                                        $(".list-group-item").removeClass('active');
+                                        //Add active on the clicked one
+                                        $(this).addClass('active');                                        
+                                        panelMPCSelection.OpenFile(obj.root + "/" + value);
+                                    });
+
+                                    //Append to list
+                                    $myNewElement.appendTo($myList);
+
+                                    //Return earlier since we found a valid one already
+                                    return false;
                                 }
                             });                        
                         });
+                        
 
                         //Iterate over the folders to add.
                         $.each( obj.folders, function( key, value ) {  
-                            myItems.push( '<a href="#" class="list-group-item"><span class="glyphicon glyphicon-folder-open"></span>  ' + value + '</a>' );
+
+                            //Create element
+                            var $myNewElement = $('<a href="#" class="list-group-item"><i class="fa fa-folder fa-fw"></i> ' + value + '</a>');
+
+                            //Attach click event
+                            $myNewElement.on( "click", function(e) {
+                                e.preventDefault();
+                                panelMPCSelection.OpenFolder(obj.root + "/" + value);
+                                $myNewElement.addClass('active');
+                            });
+
+                            //Append to list
+                            $myNewElement.appendTo($myList);
+
                         });
 
                         //Path that was used on json query
                         this.currentPath = obj.root;
-                         
-                        //Append all the HTML at once
-                        $myList.append( myItems.join( "" ) );                    
+                        this.pathHistory.push(this.currentPath);
+                        
+                        //Enable the button if there are folders to go back to
+                        $("#MPCSelection_BackFolder").toggleClass("disabled", !(this.pathHistory.length > 1));
+
+                        //Toggle proper status text
+                        $("#MPCSelection_FolderText").html("<strong><i class='fa fa-folder-open fa-lg'></i> " + this.currentPath + "</strong>");
+                        
                     }                       
                 },
 
-                Open: function(file) {
-
-                    if(file){
+                OpenFile: function(path) {
+                    if(path){
                         //Publish MQTT message
                         socket.emit('publish', {
                             topic: this.playFileMessage,
-                            message: this.currentPath + "/" + file
-                        });
-                        console.log("Published ", this.currentPath + "/" + file);
+                            message: path
+                        });                        
                     }                
                 },
 
-                Control: function(controller) {
-                    //Second part of MPC_xxx, lowercased is the MQTT message
-                    var action = controller.attr("id").split("_");
-                    action = action[1].toLowerCase();
+                OpenFolder: function(path){
+                    if(path){
+                        //Publish MQTT message
+                        socket.emit('publish', {                            
+                            topic: topicComposer(this.requestMessage, "listfiles"),
+                            message: path
+                        });                        
+                    }   
+                },
 
-                    socket.emit('publish', {
-                        topic: this.requestMessage + "/" + action,
-                        message: this.startFolder
-                    });
+                BackFolder: function(){
+                    if (this.pathHistory.length > 1){
+                        this.pathHistory.pop() //First get rid of the current folder
+                        this.OpenFolder(this.pathHistory.pop()); //Now pass the right one
+                    }
                 }
+
             }
 
             //Objects that hold the topic subscriptions and other values for that panel
             var masterPanel = [panelMPC, panelLight, paneliTunes, panelMPCSelection];
+
+            //Start sudo-constructor on each panel object that has one
+            $.each(masterPanel, function(key, obj) {
+                if (typeof obj.__begin__ === 'function') {
+                    obj.__begin__();
+                }
+            });
+
+            //Resize the page to match the proper size
+            tweakPageForEnvironment(findBootstrapEnvironment());
 
             //Create web socket and start listening for MQTT messages       
             socket.on('connect', function () {
@@ -484,10 +572,8 @@
                     {topic: 'home/player/itunes/status/#'},
                     {topic: 'home/web/config/#'},
                     {topic: 'home/htpc/#'}
-
                     );
             });
-
 
             //Check if we have a valid websocket connection
             socket.on('error', function () {
@@ -495,23 +581,18 @@
                 $("#alertWindow").html('<div class="alert alert-danger">Could not connect to the web socket server!</div>');
             })
 
+            //Show/Hide the panels depending if they have a class with the same ID as the tab
+            $('.tab_control').click(function (e) {                
+                e.preventDefault();
 
-            //Show all panels if Main tab clicked
-            $('#topTab a').click(function (e) {
-                if ($.trim($(this).text()) == "Main") {
-                    $('#Controller_Light').addClass('active');
-                    $('#Player_MPC').addClass('active');
-                    $('#Player_iTunes').addClass('active');
-                }
-            });
+                $(this).tab('show');
+                var currentId = "." + $(this).attr('id');
 
-
-            //Movie file selected
-            $(document).on('click', '.list-group-item', function(){
-                panelMPCSelection.Open($.trim($(this).text()));
-            });
-
+                $(".tab-pane").removeClass("active");
+                $(currentId).addClass("active");
+            })
       
+
             //noUiSlider Events
             $('.noUiSlider').noUiSlider({
                 range: [0, 100]
@@ -534,83 +615,21 @@
 
 
             //Button event handler. Redirects to the appropriate function 
-            $(".btn").click(function () {
+            //If button has class click_ignore, it has it's own event handler
+            $(".btn").not(".click_ignore").click(function (e) {
+                e.preventDefault();
+
                 //Get type of button from the start of the ID
                 var id_type = this.id.split("_");
                 var clicked_obj = $(this);
 
+                //Run Control method on the object
                 $.each(masterPanel, function(key, obj) {
                     if (obj.type == id_type[0]) {
-                        obj.Control(clicked_obj);
+                        obj.Click(clicked_obj);
                     }                        
                 });
             });
-
-            //Find the current page size, and tweak accordingly
-            tweakPageForEnvironment(findBootstrapEnvironment());
-
-            //Special tweaks for different page sizes
-            function tweakPageForEnvironment(env) {
-                switch (env) {
-
-                    case "ExtraSmall":
-                        //Remove icons from tab menu
-                        $.each($("#topTab").find("a").contents(), function(key, obj) {                                        
-                            if ($(obj)[0].nodeName == "#text")
-                                obj.data = "";
-                        });
-                        //Remove justified from tab menu
-                        $("#topTab").removeClass("nav-justified");
-                        //Remove every button
-                        // $(".btn").contents().filter(function(){
-                        //     return this.nodeType === 3;                    
-                        // }).remove();
-                }
-            }
-
-
-            //Tweak page based on the screen resolution
-            function findBootstrapEnvironment() {
-                var envs = ["ExtraSmall", "Small", "Medium", "Large"];
-                var envValues = ["xs", "sm", "md", "lg"];
-
-                $el = $('<div>');
-                $el.appendTo($('body'));
-
-                for (var i = envValues.length - 1; i >= 0; i--) {
-                    var envVal = envValues[i];
-
-                    $el.addClass('hidden-'+envVal);
-                    if ($el.is(':hidden')) {
-                        $el.remove();
-                        return envs[i]
-                    }
-                };
-            }
-
-            //Takes an arbritary number of arguments and sanitize the topic with proper '/'.
-            function topicComposer(arg){                  
-                var finalTopic = "";
-
-                for (var i = 0; i < arguments.length; i++) {
-                    explodedTopic = arguments[i].split("/");
-
-                    $.each(explodedTopic, function(key, topicPart) {
-                        if (topicPart){
-                            finalTopic += topicPart + "/";
-                        }
-                    });
-                }
-
-                //Clears out the final /
-                return finalTopic.substr(0,finalTopic.length-1);
-            }
-
-            // $(window).resize(function () {
-            //     //console.log($(document).width());
-            //     console.log(findBootstrapEnvironment());
-            // });
-          
         });
     
     </script>
