@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<EventGhost Version="1610" Guid="{D0F82419-F5BA-4BCA-B068-0A0CA608D730}" Time="1392358774.13">
+<EventGhost Version="1610" Guid="{59F4FE8B-9033-4920-B575-30EA57C29B04}" Time="1392515355.68">
     <Autostart Name="Autostart" Expanded="True">
         <Plugin Identifier="OSE" Guid="{D3D2DDD1-9BEB-4A26-969B-C82FA8EAB280}" File="OSE">
             gAJYAwAAAD4+IHEAWAQAAAB84oCicQGGcQIu
@@ -107,7 +107,7 @@
     </Folder>
     <Folder Name="iTunes">
         <Folder Name="iTunes Control" Expanded="True">
-            <Macro Name="iTunes: Open" id="44" Expanded="True">
+            <Macro Name="iTunes: Open" id="44" Enabled="False" Expanded="True">
                 <Event Name="Main.home/player/itunes/openclose" />
                 <Action>
                     iTunes2.StartApp()
@@ -235,7 +235,7 @@
             </Macro>
         </Folder>
     </Folder>
-    <Folder Name="MPC">
+    <Folder Name="MPC" Expanded="True">
         <Folder Name="MPC Control">
             <Macro Name="Media Player Classic: Play/Pause" Expanded="True">
                 <Event Name="Main.home/player/mpc/playpause" />
@@ -268,7 +268,7 @@
                 </Action>
             </Macro>
         </Folder>
-        <Folder Name="MPC Status" Expanded="True">
+        <Folder Name="MPC Status">
             <Macro Name="MPC Opened" Expanded="True">
                 <Event Name="MPC-HC.Connected" />
                 <Action>
@@ -281,7 +281,7 @@
                     EventGhost.TriggerEvent(u'MPC-HC.Playstate.Play', 0.0)
                 </Action>
             </Macro>
-            <Macro Name="MPC Started Playing" id="123" Enabled="False" Expanded="True">
+            <Macro Name="MPC Started Playing" id="123" Expanded="True">
                 <Event Name="MPC-HC.Playstate.Play" />
                 <Action>
                     EventGhost.DisableItem(XmlIdLink(123))
@@ -311,7 +311,7 @@
                     EventGhost.NewJumpIf(XmlIdLink(134), 2, False)
                 </Action>
             </Macro>
-            <Macro Name="Send MQTT Playing Times" id="134">
+            <Macro Name="Send MQTT Playing Times" id="134" Enabled="False">
                 <Event Name="Main.UpdateMQTTTime" />
                 <Action>
                     MediaPlayerClassic.GetTimes()
@@ -335,7 +335,7 @@
                     EventGhost.EnableItem(XmlIdLink(123))
                 </Action>
             </Macro>
-            <Macro Name="MPC Stopped Playing" id="144">
+            <Macro Name="MPC Stopped Playing" id="144" Enabled="False">
                 <Event Name="MPC-HC.State.Closing" />
                 <Event Name="MPC-HC.Playstate.Stop" />
                 <Action>
@@ -376,7 +376,7 @@
             </Macro>
         </Folder>
         <Folder Name="MPC Movie Selection" Expanded="True">
-            <Macro Name="EGMQonttrol: Get File List">
+            <Macro Name="EGMQonttrol: Get File List" Expanded="True">
                 <Event Name="Main.home/htpc/listfiles" />
                 <Action>
                     EGMQonttrol.SendFileList()
@@ -402,7 +402,7 @@
             </Macro>
         </Folder>
     </Folder>
-    <Folder Name="PC">
+    <Folder Name="PC" Expanded="True">
         <Folder Name="PC Control">
             <Macro Name="Stand By" Expanded="True">
                 <Event Name="Main.home/htpc/sleep" />
@@ -411,9 +411,12 @@
                 </Action>
             </Macro>
         </Folder>
-        <Folder Name="PC Status">
+        <Folder Name="PC Status" Expanded="True">
             <Macro Name="PC Awake" Expanded="True">
                 <Event Name="System.Resume" />
+                <Action>
+                    EventGhost.NewJumpIf(XmlIdLink(12), 2, True)
+                </Action>
                 <Action Name="MQTT Client: home/htpc, on">
                     MQTTthreads.publishMQTT(u'HTPC', u'192.168.0.175', 1883, u'home/htpc', u'on', 0, True)
                 </Action>
