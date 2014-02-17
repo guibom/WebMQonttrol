@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<EventGhost Version="1610" Guid="{56014AFA-7A82-4527-A61F-100ADEC3FAEA}" Time="1392614740.43">
+<EventGhost Version="1610" Guid="{D8778F87-60AE-46C9-89D6-049DDC35BCA3}" Time="1392617756.94">
     <Autostart Name="Autostart">
         <Plugin Identifier="OSE" Guid="{D3D2DDD1-9BEB-4A26-969B-C82FA8EAB280}" File="OSE">
             gAJYAwAAAD4+IHEAWAQAAAB84oCicQGGcQIu
@@ -99,9 +99,9 @@
             <Event Name="Keyboard.LAlt+LWin+U00+Return" />
         </Macro>
     </Folder>
-    <Folder Name="iTunes">
-        <Folder Name="iTunes Control" Expanded="True">
-            <Macro Name="iTunes: Open" id="42" Expanded="True">
+    <Folder Name="iTunes" Expanded="True">
+        <Folder Name="iTunes MQTT Control" Expanded="True">
+            <Macro Name="iTunes: Open" id="42">
                 <Event Name="Main.home/player/itunes/openclose" />
                 <Action>
                     iTunes2.StartApp()
@@ -149,6 +149,7 @@
                     iTunes2.ChangeVolume(-5)
                 </Action>
             </Macro>
+            <Macro Name="&lt;unnamed macro&gt;" />
         </Folder>
         <Folder Name="iTunes Status" Expanded="True">
             <Macro Name="iTunes Opened">
@@ -230,7 +231,7 @@
         </Folder>
     </Folder>
     <Folder Name="MPC" Expanded="True">
-        <Folder Name="MPC MQTT Control" Expanded="True">
+        <Folder Name="MPC MQTT Control">
             <Macro Name="Media Player Classic: Play/Pause">
                 <Event Name="Main.home/player/mpc/playpause" />
                 <Action>
@@ -274,7 +275,7 @@
                 </Action>
             </Macro>
         </Folder>
-        <Folder Name="MPC Status" Expanded="True">
+        <Folder Name="MPC Status">
             <Macro Name="MPC Opened">
                 <Event Name="MPC-HC.Connected" />
                 <Action Name="Check if already open">
