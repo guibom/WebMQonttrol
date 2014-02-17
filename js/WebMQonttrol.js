@@ -2,6 +2,14 @@
 // https://github.com/guibom/WebMQonttrol
 // Released under the MIT license. See LICENSE file for details.
 
+//Global variables
+var debug_show = false;  //If it's on, no panels will be hidden          
+var msg; //global msg variable       
+
+//Connect to socket and MQTT broker
+var socket = io.connect('http://192.168.0.175:3000');
+
+
 //Special tweaks for different page sizes
 function tweakPageForEnvironment(env) {
     switch (env) {

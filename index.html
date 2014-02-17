@@ -140,7 +140,7 @@
                                 <div class="row">
                                     <div class="col-xs-4">
                                         <button type="button" id="MPCSelection_BackFolder" class="btn btn-primary btn-md btn-block disabled click_ignore">
-                                        <i class="fa fa-folder-o fa-lg"></i> Back one folder
+                                        <i class="fa fa-folder-o fa-lg"></i> Back ..
                                         </button>
                                     </div>
                                     <div class="col-xs-4">
@@ -225,330 +225,25 @@
 
     <!-- Utility Functions -->
     <script src="js/WebMQonttrol.js"></script>
+
+    <!-- Individual Panel scripts -->
+    <script src="panels/panelLight.js"></script>
+    <script src="panels/panelMPC.js"></script>
+    <script src="panels/paneliTunes.js"></script>
+    <script src="panels/panelMPCSelection.js"></script>    
+
     <!-- Main Script -->
     <script>
 
-        $(function() {            
-
-            //Connect to socket and MQTT broker
-            var socket = io.connect('http://192.168.0.175:3000');
-
-            //Global variables
-            var debug_show = false;  //If it's on, no panels will be hidden          
-            var msg; //global msg variable
-
-            //Object for Light messages
-            var panelLight = {
-                //Properties
-                type: "Light",
-                $panel: $("#Controller_Light"),
-
-                "home/light/1/status": function() {
-                    if (msg.payload == 'on') {
-                        $('#Light_1').html('<span class="glyphicon glyphicon-ok"></span> ON');                        
-                        $('#Light_1').removeClass('btn-danger').addClass('btn-success');
-                    } else {
-                        $('#Light_1').html('<span class="glyphicon glyphicon-remove"></span> OFF');  
-                        $('#Light_1').removeClass('btn-success').addClass('btn-danger');
-                    }
-                },
-
-                "home/light/1/status/brightness": function() {
-                    $('#Light_1_Brightness').text(msg.payload);
-                    $('#slider1').val(parseInt(msg.payload));
-                },
-
-                Click: function(controller) {
-                    //Get light number from jquery object's id
-                    var light_id = controller.attr("id").split("_");
-                    light_id = light_id[1];
-                    var current_status = $.trim($(controller).text().toLowerCase());
-                    var send_msg;
-
-                    //Toggle light status message
-                    if (current_status == "on") {
-                        send_msg = "off";                            
-                    } else if (current_status == "off") {
-                        send_msg = "on";                             
-                    }                            
-
-                    //Publish MQTT message
-                    socket.emit('publish', {
-                        topic: 'home/light/' + light_id + '/' + send_msg,
-                        message: '1'
-                    });
-                }
-            }
-
-            //Object for iTunes messages
-            var paneliTunes = {
-                //Default values
-                type: "iTunes",
-                $panel: $("#Player_iTunes"),
-                actionMessage: "home/player/itunes/",
-                
-                "home/player/itunes/status/playing": function() {
-                    if (msg.payload == '1') {                            
-                        $("#iTunes_PlayPause").html('<span class="glyphicon glyphicon-pause"></span> Pause'); 
-                        $("#iTunes_PlayPause").addClass('btn-warning').removeClass('btn-primary')
-                    } else {
-                        $("#iTunes_PlayPause").html('<span class="glyphicon glyphicon-play"></span> Play');
-                        $("#iTunes_PlayPause").addClass('btn-primary').removeClass('btn-warning')
-                    }
-                },
-
-                "home/player/itunes": function() {
-                    if (msg.payload == 'on') {                            
-                        $("#iTunes_OpenClose").html('<span class="glyphicon glyphicon-off"></span> Close'); 
-                        $("#iTunes_OpenClose").addClass('btn-warning').removeClass('btn-primary')
-                        //Show title text element
-                        $('#iTunes_Title').removeClass('hide');
-
-                        //Enable all the buttons
-                        $('#iTunes_Grid').find("button").each(function(index, element){
-                            $(this).removeClass('disabled');
-                        });
-
-                    } else {
-                        $("#iTunes_OpenClose").html('<span class="glyphicon glyphicon-off"></span> Open');
-                        $("#iTunes_OpenClose").addClass('btn-primary').removeClass('btn-warning')
-                        //Hide title text element
-                        $('#iTunes_Title').addClass('hide');
-
-                        //Disable all the buttons. 
-                        $('#iTunes_Grid').find("button").each(function(index, element){
-                            $(this).addClass('disabled');
-                        });
-                        //Re-enable OpenClose button, since it works without iTunes open.
-                        $('#iTunes_OpenClose').removeClass('disabled')
-                    }
-                },
-
-                "home/player/itunes/status/title": function() {
-                    if (msg.payload != "" && msg.payload != "0") {
-                        $('#iTunes_Title').html(msg.payload); 
-                    } else {
-                        $('#iTunes_Title').html('Title not found'); 
-                    }
-                },
-
-                Click: function(controller) {
-                    //Second part of MPC_xxx, lowercased is the MQTT message
-                    var action = controller.attr("id").split("_");
-                    action = action[1].toLowerCase();
-
-                    socket.emit('publish', {
-                        topic: this.actionMessage + action,
-                        message: '1'
-                    });
-                }
-            }
-
-            //Object for MPC messages
-            var panelMPC = {
-                //Default values
-                type: "MPC",
-                $panel: $("#Player_MPC"),
-                actionMessage: "home/player/mpc/",
-                MPCBarTotal: 0,
-
-                "home/player/mpc": function() {                    
-                    if (msg.payload == 'on' || debug_show) {                        
-                        showPanel(this.$panel);
-                    } else {                    
-                        hidePanel(this.$panel);
-                    }
-                },
-
-                "home/player/mpc/status/total_time": function() {
-                    MPCBarTotal = msg.payload;                         
-                },
-
-                "home/player/mpc/status/current_time": function() {                        
-                    var current_time = parseInt(msg.payload);                        
-                    document.getElementById('MPCBar').style.width = ((current_time * 100) / MPCBarTotal) + '%';
-                },
-
-                "home/player/mpc/status/playing": function() {
-                    //Playing
-                    if (msg.payload == '1') {
-                        $('#MPCBar').removeClass('hide')
-                        $('#MPCBar_Base').addClass('active');
-
-                        $("#MPC_PlayPause").html('<span class="glyphicon glyphicon-pause"></span> Pause'); 
-                        $("#MPC_PlayPause").addClass('btn-warning').removeClass('btn-primary')
-                    //Paused
-                    } else if (msg.payload == "2") {
-                        $('#MPCBar').removeClass('hide');
-                        $('#MPCBar_Base').removeClass('active');
-
-                        $("#MPC_PlayPause").html('<span class="glyphicon glyphicon-play"></span> Play');
-                        $("#MPC_PlayPause").addClass('btn-primary').removeClass('btn-warning')
-                    //Stopped
-                    } else {
-                        $('#MPCBar').addClass('hide');
-
-                        $("#MPC_PlayPause").html('<span class="glyphicon glyphicon-play"></span> Play');
-                        $("#MPC_PlayPause").addClass('btn-primary').removeClass('btn-warning')
-                    }
-                },
-                
-                "home/player/mpc/status/filename": function() {
-                    if (msg.payload != "" && msg.payload != "0") {
-                        $('#mpc_filename').html(msg.payload); 
-                    } else {
-                        $('#mpc_filename').html('Filename not found'); 
-                    }
-                },
-
-                Click: function(controller) {
-                    //Second part of MPC_xxx, lowercased is the MQTT message
-                    var action = controller.attr("id").split("_");
-                    action = action[1].toLowerCase();
-
-                    socket.emit('publish', {
-                        topic: this.actionMessage + action,
-                        message: '1'
-                    });
-                }
-            }
-
-            //File selection to start a video in MPC
-            var panelMPCSelection = {
-                //Default values
-                type: "MPCSelection",
-                requestMessage: "home/htpc",
-                playFileMessage: "home/player/mpc/open",
-                extFilter: ["mkv", "mp4", "avi", "wmv"],
-                currentPath: "",
-                pathHistory: [],
-
-                //Constructor, run once at start
-                __begin__: function(){
-
-                    //Set event handler for file selection buttons
-                    $("#MPCSelection_BackFolder").on("click", function(e) {
-                        e.preventDefault();
-                        panelMPCSelection.BackFolder();
-                    });
-
-                    $("#MPCSelection_ListFiles_1").on("click", function(e) {
-                        e.preventDefault();                        
-                        panelMPCSelection.OpenFolder("c:/users/longinus/downloads");
-                    });
-
-                    $("#MPCSelection_ListFiles_2").on("click", function(e) {
-                        e.preventDefault();
-                        panelMPCSelection.OpenFolder("E:/MOVE/_WATCH");
-                    });
-                    
-                },
-
-                "home/htpc/listfiles/result": function() {
-                    if (msg.payload) {
-                        var obj = $.parseJSON(msg.payload);
-                        var extFilter = this.extFilter;                        
-                        var $myList = $("#MPC_File_List");
-                        
-                        //Clear file list
-                        $myList.empty();
-
-                        //Iterate over the JSON object, finding files to add
-                        $.each( obj.files, function( key, value ) {
-                            //Check if the file matches the filtered extensions
-                            $.each(extFilter, function(keyF, valueFilter) {
-                                if (valueFilter == value.split('.').pop()) {                                    
-                                    
-                                    //Create element
-                                    var $myNewElement = $('<a href="#" class="list-group-item"><i class="fa fa-file-o fa-fw"></i> ' + value + '</a>');
-
-                                    //Attach click event, with proper path to be used
-                                    $myNewElement.on( "click", function(e) {
-                                        e.preventDefault();
-                                        //Remove active from other list items
-                                        $(".list-group-item").removeClass('active');
-                                        //Add active on the clicked one
-                                        $(this).addClass('active');                                        
-                                        panelMPCSelection.OpenFile(obj.root + "/" + value);
-                                    });
-
-                                    //Append to list
-                                    $myNewElement.appendTo($myList);
-
-                                    //Return earlier since we found a valid one already
-                                    return false;
-                                }
-                            });                        
-                        });
-                        
-
-                        //Iterate over the folders to add.
-                        $.each( obj.folders, function( key, value ) {  
-
-                            //Create element
-                            var $myNewElement = $('<a href="#" class="list-group-item"><i class="fa fa-folder fa-fw"></i> ' + value + '</a>');
-
-                            //Attach click event
-                            $myNewElement.on( "click", function(e) {
-                                e.preventDefault();
-                                panelMPCSelection.OpenFolder(obj.root + "/" + value);
-                                $myNewElement.addClass('active');
-                            });
-
-                            //Append to list
-                            $myNewElement.appendTo($myList);
-
-                        });
-
-                        //Path that was used on json query
-                        this.currentPath = obj.root;
-                        this.pathHistory.push(this.currentPath);
-                        
-                        //Enable the button if there are folders to go back to
-                        $("#MPCSelection_BackFolder").toggleClass("disabled", !(this.pathHistory.length > 1));
-
-                        //Toggle proper status text
-                        $("#MPCSelection_FolderText").html("<strong><i class='fa fa-folder-open fa-lg'></i> " + this.currentPath + "</strong>");
-                        
-                    }                       
-                },
-
-                OpenFile: function(path) {
-                    if(path){
-                        //Publish MQTT message
-                        socket.emit('publish', {
-                            topic: this.playFileMessage,
-                            message: path
-                        });                        
-                    }                
-                },
-
-                OpenFolder: function(path){
-                    if(path){
-                        //Publish MQTT message
-                        socket.emit('publish', {                            
-                            topic: topicComposer(this.requestMessage, "listfiles"),
-                            message: path
-                        });                        
-                    }   
-                },
-
-                BackFolder: function(){
-                    if (this.pathHistory.length > 1){
-                        this.pathHistory.pop() //First get rid of the current folder
-                        this.OpenFolder(this.pathHistory.pop()); //Now pass the right one
-                    }
-                }
-            }
+        $(function() {                       
 
             //Objects that hold the topic subscriptions and other values for that panel
             var masterPanel = [panelMPC, panelLight, paneliTunes, panelMPCSelection];
 
             //Start sudo-constructor on each panel object that has one
             $.each(masterPanel, function(key, obj) {
-                if (typeof obj.__begin__ === 'function') {
-                    obj.__begin__();
-                }
+                if (typeof obj.__begin__ === 'function')
+                    obj.__begin__();            
             });
 
             //Resize the page to match the proper size
@@ -591,7 +286,7 @@
             })
 
             //Show/Hide the panels depending if they have a class with the same ID as the tab
-            $('.tab_control').click(function (e) {                
+            $('.tab_control').click(function (e) {
                 e.preventDefault();
 
                 $(this).tab('show');
