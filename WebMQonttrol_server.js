@@ -20,13 +20,18 @@ var io = socket.listen(3000);
 var mqttclient = mqtt.createClient(mqttport, mqttbroker);
 
 // Reduce socket.io debug output
-io.set('log level', 0)
+io.set('log level', 0);
 var debug_messages = false;
 
-//Enable debug messages from command line
-if (process.argv.length >= 2)
-    if (process.argv[2].toLowerCase() == "debug")
-        debug_messages = true;
+//Console commands
+process.argv.forEach(function (val, index, array) {  
+    if (val) {
+        if (val.toLowerCase() == "debug") {
+            debug_messages = true;
+            io.set('log level', 1);
+        }
+    }  
+});
 
 DEBUG_LOG('Server Started!');
 
@@ -41,23 +46,31 @@ io.sockets.on('connection', function (socket) {
 
         //Subscribe to all the messages passed as arguments
         for (var i = 0; i < arguments.length; i++) {
-            mqttclient.subscribe(arguments[i].topic);
-
-            //Log subscriptions to console
-            if (debug_messages) {
-                console.log('SUB:', arguments[i].topic);
-            }  
+            
+            try {
+                //Subscribe                
+                mqttclient.subscribe(arguments[i].topic);
+                //Log subscriptions to console
+                DEBUG_LOG('SUB: ' + arguments[i].topic);
+            }
+            catch(err) {
+                DEBUG_LOG('ERROR: ' + err, true);            
+            }            
         }
     });
 
     //Publish to topic/message
     socket.on('publish', function (data) {
 
-        //if (data.length < 2)
-        //Log MQTT messages being sent
-        if (debug_messages) {
-            console.log('SENT:', data.topic, data.message);
+        //Check message
+        if (data.topic == false || data.message == false)
+        {
+            DEBUG_LOG('Error, topic/message is not valid!');
+            return false;
         }
+
+        //Log MQTT messages being sent
+        DEBUG_LOG('SENT: ' + data.topic + " " + data.message);
 
         //Publish MQTT message
         try {
@@ -84,16 +97,16 @@ mqttclient.on('message', function(topic, payload) {
     );
 
     //Log MQTT messages being received
-	if (debug_messages) {
-        console.log('RECEIVED:', topic, payload);
-    }        
-
+    DEBUG_LOG('RECEIVED: ' + topic + " " + payload);
 });
 
 
 //Print debug message to log, if server in debug mode
-function DEBUG_LOG(msg, force=false)
+function DEBUG_LOG(msg, force)
 {
+    //Default value of force
+    force = typeof force !== 'undefined' ? force : false;
+
     if (debug_messages) {
         console.log(msg);
     }
