@@ -23,8 +23,16 @@ var mqttclient = mqtt.createClient(mqttport, mqttbroker);
 io.set('log level', 0)
 var debug_messages = false;
 
+//Enable debug messages from command line
+if (process.argv[2].toLowerCase() == "debug")
+    debug_messages = true;
+
 // Subscribe to topic
 io.sockets.on('connection', function (socket) {
+    //Log subscriptions to console
+    if (debug_messages) {
+        console.log('Connected:', socket);
+    }  
 
     //Subscribe to an arbitrary number of topics
     socket.on('subscribe', function (data) {        
@@ -41,13 +49,14 @@ io.sockets.on('connection', function (socket) {
     });
 
     //Publish to topic/message
-    socket.on('publish', function (data) {
-    	mqttclient.publish(data.topic, data.message);
-
+    socket.on('publish', function (data) {    	
         //Log MQTT messages being sent
         if (debug_messages) {
             console.log('SENT:', data.topic, data.message);
-        }  
+        }
+
+        //Publish MQTT message
+        mqttclient.publish(data.topic, data.message);
     });
 
     //Unsubscribe from topic
