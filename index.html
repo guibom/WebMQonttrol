@@ -45,6 +45,7 @@
         <!-- TAB PANE START -->
             <div class="tab-content">       
 
+            <!-- START Light Control Panel -->
                 <div class="tab-pane panel panel-default active Tab_Controller_Light Tab_Main" id="Controller_Light">
                     <div class="panel-heading">
                         <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>                        
@@ -60,7 +61,7 @@
                             <div class="col-sm-5 col-xs-5" style="text-align:center; padding-top: 28px; padding-left: 20px; padding-right: 20px">                            
                                 <div class="noUiSlider" id="slider1"></div>                            
                             </div>
-                            <div class="col-sm-2 col-xs-4" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
+                            <div class="col-sm-2 col-xs-4" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-danger WMQ_light" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-remove"></span> N/A</a>
                             </div>
                         </div>                    
                     </div>
@@ -70,12 +71,14 @@
                             <div class="col-sm-10" >
                                 <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">TV light</span></h2>
                             </div>
-                            <div class="col-sm-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_2" class="btn btn-block btn-lg btn-success" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-ok"></span> N/A</a>
+                            <div class="col-sm-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_2" class="btn btn-block btn-lg btn-danger WMQ_light" role="button" style="vertical-align:bottom;"><span class="glyphicon glyphicon-remove"></span> N/A</a>
                             </div>
                         </div>                    
                     </div>
                 </div>
+            <!-- END Light Control Panel -->
 
+            <!-- START MPC Control Panel -->
                 <div class="panel panel-default tab-pane active Tab_Player_MPC Tab_Main" id="Player_MPC">
                     <div class="panel-heading">
                         <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-film"></span> Media Player Control</span></h3>
@@ -127,6 +130,7 @@
                         </div>
                     </div>
                 </div>
+            <!-- END MPC Control Panel -->
 
             <!-- START MPC Selection Panel -->
                 <div class="panel panel-default tab-pane Tab_Player_MPC" id="Player_MPCSelection">
@@ -249,7 +253,7 @@
             //Resize the page to match the proper size
             tweakPageForEnvironment(findBootstrapEnvironment());
 
-            //Create web socket and start listening for MQTT messages       
+            //Create web socket and start listening for MQTT messages
             socket.on('connect', function () {
                 socket.on('mqtt', function (lastmsg) {
 
