@@ -1,9 +1,9 @@
 ### Interfaces
-Controller messages are set at start, and a will defined for unexpect disconnects.
+Controller messages are set at start, and a will defined for unexpect disconnects. Gateways interface ethernet to RF/etc.
 Players get the information from EventGhost running on my HTPC
 ```
-home/controller/MQTTRF			(on, off) Retained
-home/controller/MQTTRF/light/#	(string) _ID of light_ Retained
+home/gateway/MQTTRF			    (on, off) Retained
+home/gateway/MQTTRF/light/#	    (string) _ID of light_ Retained
 
 home/player/mpc					(on, off) Retained		
 home/player/itunes				(on, off) Retained
@@ -78,7 +78,7 @@ weather/home/currently/icon                 (forecast.io icons) 5min intervals
 Short-form messages transmitted by sensor network, and how they are processed into full proper messages by Node_RED
 ```
 S/T/$ID (int)  -->  /sensor/temperature/$ID/raw/last    (int)
-S/H/$ID (int)  -->  /sensor/humidity/$ID/raw/last   (int)
+S/H/$ID (int)  -->  /sensor/humidity/$ID/raw/last       (int)
 
 C/L/10/S        Controller/
 C/L/10/G
