@@ -1,4 +1,4 @@
-// MQTTRF Arduino web controller to RF433 transmitter controller
+// MQTTRF Arduino web gateway to RF433 transmitter controller
 // Copyright (c) 2014, Guilherme Ramos <longinus@gmail.com>
 // https://github.com/guibom/WebMQonttrol
 // Released under the MIT license. See LICENSE file for details.
@@ -142,10 +142,10 @@ void lightUpdate(byte lightId, byte lightCmd, int val, byte lightMax)
 void setup()
 {  
     Ethernet.begin(mac, ip);
-    if (client.connect("MQTTRF", "home/controller/MQTTRF", 0, 1, STR_OFF)) {
-        //Publish controller abilities and conencted hardware
-        client.publish("home/controller/MQTTRF", (uint8_t *)"on", 2, 1);
-        client.publish("home/controller/MQTTRF/light/1", (uint8_t *)"1", 1, 1);
+    if (client.connect("MQTTRF", "home/gateway/MQTTRF", 0, 1, STR_OFF)) {
+        //Publish gateway abilities and conencted hardware
+        client.publish("home/gateway/MQTTRF", (uint8_t *)"on", 2, 1);
+        client.publish("home/gateway/MQTTRF/light/1", (uint8_t *)"1", 1, 1);
         
         //Subscriptions
         client.subscribe("home/light/1/#");
