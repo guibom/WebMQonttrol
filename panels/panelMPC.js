@@ -7,8 +7,25 @@ var panelMPC = {
     //Default values
     type: "MPC",
     $panel: $("#Player_MPC"),
+    $mpcButtons: $(".WMQ_mpc.btn"),
     actionMessage: "home/player/mpc/",
     MPCBarTotal: 0,
+
+    //Constructor, run once at start
+    __begin__: function(){
+        
+        //Iterate over light buttons to get ID
+        this.$mpcButtons.map(function() {
+            //Set state and ID based on the id of the DOM element
+            $(this).data("action", getActionFromId($(this), panelMPC.type));
+        });
+
+        //Bind click events
+        this.$mpcButtons.on("click", function(e) {
+            e.preventDefault();
+            panelMPC.Control($(this));
+        });
+    },
 
     "home/player/mpc": function() {                    
         if (msg.payload == 'on' || debug_show) {                        
@@ -59,14 +76,13 @@ var panelMPC = {
         }
     },
 
-    Click: function(controller) {
-        //Second part of MPC_xxx, lowercased is the MQTT message
-        var action = controller.attr("id").split("_");
-        action = action[1].toLowerCase();
-
+    Control: function($controller){
+        //Publish MQTT message
         socket.emit('publish', {
-            topic: this.actionMessage + action,
+            topic: topicComposer(panelMPC.actionMessage, $controller.data("action")),
             message: '1'
         });
+
     }
+
 }

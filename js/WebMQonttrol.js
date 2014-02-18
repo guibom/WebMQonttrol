@@ -29,7 +29,6 @@ function tweakPageForEnvironment(env) {
     }
 }
 
-
 //Tweak page based on the screen resolution
 function findBootstrapEnvironment() {
     var envs = ["ExtraSmall", "Small", "Medium", "Large"];
@@ -68,18 +67,26 @@ function topicComposer(arg){
     return finalTopic.substr(0,finalTopic.length-1).toLowerCase();
 }
 
+//Return the Action message from DOM id in the format <Type>_<Action>
+function getActionFromId($obj, panel_type){
+    return $obj.attr('id').split(panel_type + "_").pop();    
+}
 
-function hidePanel($panel)
-{
+//Assign hide class
+function hidePanel($panel) {
     $panel.addClass('hide');
 }
 
-function showPanel($panel)
-{
+//Remove hide class
+function showPanel($panel) {
     $panel.removeClass('hide');
 }
 
-
+//Display an alert message, log to console
+function logError(error){
+    console.log(error);
+    $("#alertWindow").html('<div class="alert alert-danger">' + error + '</div>');
+}
 
 // $(window).resize(function () {
 //     //console.log($(document).width());

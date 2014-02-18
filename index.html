@@ -29,6 +29,7 @@
             <!-- Shows error messages and other alerts -->
             <div id="alertWindow"></div>
 
+        <!-- TAB Header -->
             <div class="panel panel-default" style="border-radius: 0px; border: 0px; box-shadow: 0px 0px 0px 0px; margin-bottom: 0px">
                 <div class="panel-body" style="border-radius: 0px; ">
                     <ul class="nav nav-tabs nav-justified" id="topTab">
@@ -93,37 +94,37 @@
 
                         <div class="row">
                             <div class="col-sm-3">
-                                <button type="button" id="MPC_PlayPause" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="MPC_PlayPause" class="btn btn-primary btn-lg btn-block WMQ_mpc">
                                 <span class="glyphicon glyphicon-play"></span> Play
                                 </button>
                             </div>
                             <div class="col-sm-2">
-                                <button type="button" id="MPC_Stop" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="MPC_Stop" class="btn btn-primary btn-lg btn-block WMQ_mpc">
                                 <span class="glyphicon glyphicon-stop"></span> Stop
                                 </button>
                             </div>
                             <div class="col-sm-1">
-                                <button type="button" id="MPC_VolumeUp" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="MPC_VolumeUp" class="btn btn-primary btn-lg btn-block WMQ_mpc">
                                 <span class="glyphicon glyphicon-volume-up"></span>
                                 </button>
                             </div>
                             <div class="col-sm-1">
-                                <button type="button" id="MPC_VolumeDown" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="MPC_VolumeDown" class="btn btn-primary btn-lg btn-block WMQ_mpc">
                                 <span class="glyphicon glyphicon-volume-down"></span>
                                 </button>
                             </div>
                             <div class="col-sm-1">
-                                <button type="button" id="MPC_Mute" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="MPC_Mute" class="btn btn-primary btn-lg btn-block WMQ_mpc">
                                 <span class="glyphicon glyphicon-volume-off"></span>
                                 </button>
                             </div>
                             <div class="col-sm-1">
-                                <button type="button" id="MPC_Fullscreen" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="MPC_Fullscreen" class="btn btn-primary btn-lg btn-block WMQ_mpc">
                                 <span class="glyphicon glyphicon-fullscreen"></span>
                                 </button>
                             </div>
                             <div class="col-sm-3">
-                                <button type="button" id="MPC_Close" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="MPC_Close" class="btn btn-primary btn-lg btn-block WMQ_mpc">
                                 <span class="glyphicon glyphicon-off"></span> Close
                                 </button>
                             </div>
@@ -143,17 +144,17 @@
                             <div class="panel-body">
                                 <div class="row">
                                     <div class="col-xs-4">
-                                        <button type="button" id="MPCSelection_BackFolder" class="btn btn-primary btn-md btn-block disabled click_ignore">
+                                        <button type="button" id="MPCSelection_BackFolder" class="btn btn-primary btn-md btn-block disabled">
                                         <i class="fa fa-folder-o fa-lg"></i> Back ..
                                         </button>
                                     </div>
                                     <div class="col-xs-4">
-                                        <button type="button" id="MPCSelection_ListFiles_1" class="btn btn-primary btn-md btn-block click_ignore">
+                                        <button type="button" id="MPCSelection_ListFiles_1" class="btn btn-primary btn-md btn-block">
                                         <i class="fa fa-folder-o fa-lg"></i> Folder Downloads
                                         </button>
                                     </div>
                                     <div class="col-xs-4">
-                                        <button type="button" id="MPCSelection_ListFiles_2" class="btn btn-primary btn-md btn-block click_ignore">
+                                        <button type="button" id="MPCSelection_ListFiles_2" class="btn btn-primary btn-md btn-block">
                                         <i class="fa fa-folder-o fa-lg"></i> Folder E:\Watch
                                         </button>
                                     </div>
@@ -171,6 +172,7 @@
                 </div>
             <!-- END MPC Selection Panel -->
 
+            <!-- START iTunes Control Panel -->
                 <div class="panel panel-default tab-pane active Tab_Player_iTunes Tab_Controller_PC Tab_Status_Weather Tab_Main" id="Player_iTunes">
                     <div class="panel-heading">
                         <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-music"></span> iTunes Control</span></h3>
@@ -179,40 +181,41 @@
                         <p><small id="iTunes_Title">No music playing</small></p>
                         <div class="row" id="iTunes_Grid">
                             <div class="col-sm-3">
-                                <button type="button" id="iTunes_PlayPause" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="iTunes_PlayPause" class="btn btn-primary btn-lg btn-block WMQ_itunes">
                                 <span class="glyphicon glyphicon-play"></span> Play
                                 </button>
                             </div>
                             <div class="col-sm-2">
-                                <button type="button" id="iTunes_Stop" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="iTunes_Stop" class="btn btn-primary btn-lg btn-block WMQ_itunes">
                                 <span class="glyphicon glyphicon-stop"></span> Stop
                                 </button>
                             </div>
                             <div class="col-sm-2">
-                                <button type="button" id="iTunes_VolumeUp" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="iTunes_VolumeUp" class="btn btn-primary btn-lg btn-block WMQ_itunes">
                                 <span class="glyphicon glyphicon-volume-up"></span> Vol.Up
                                 </button>
                             </div>
                             <div class="col-sm-2">
-                                <button type="button" id="iTunes_VolumeDown" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="iTunes_VolumeDown" class="btn btn-primary btn-lg btn-block WMQ_itunes">
                                 <span class="glyphicon glyphicon-volume-down"></span> Vol.Down
                                 </button>
                             </div>
                             <div class="col-sm-3">
-                                <button type="button" id="iTunes_OpenClose" class="btn btn-primary btn-lg btn-block">
+                                <button type="button" id="iTunes_OpenClose" class="btn btn-primary btn-lg btn-block WMQ_itunes">
                                 <span class="glyphicon glyphicon-off"></span> Open
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+            <!-- END iTunes Control Panel -->
 
             </div>
         <!-- TAB PANE END -->                        
 
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <b>Last MQTT message:  </b>  <small id="message">no message recieved</small>
+                    <b>Last MQTT message:  </b><small id="message">no message recieved</small>
                 </div>
             </div>
 
@@ -245,6 +248,7 @@
             var masterPanel = [panelMPC, panelLight, paneliTunes, panelMPCSelection];
 
             //Start sudo-constructor on each panel object that has one
+            //Do it before starting the web socket
             $.each(masterPanel, function(key, obj) {
                 if (typeof obj.__begin__ === 'function')
                     obj.__begin__();            
@@ -285,8 +289,7 @@
 
             //Check if we have a valid websocket connection
             socket.on('error', function () {
-                console.log("Couldn't connect to the web socket!");
-                $("#alertWindow").html('<div class="alert alert-danger">Could not connect to the web socket server!</div>');
+                logError("Could not connect to the web socket server!");                
             })
 
             //Show/Hide the panels depending if they have a class with the same ID as the tab
@@ -319,24 +322,6 @@
                 ,slide: function(){
                     $('#Light_1_Brightness').text($("#slider1").val());
                 }
-            });
-
-
-            //Button event handler. Redirects to the appropriate function 
-            //If button has class click_ignore, it has it's own event handler
-            $(".btn").not(".click_ignore").click(function (e) {
-                e.preventDefault();
-
-                //Get type of button from the start of the ID
-                var id_type = this.id.split("_");
-                var clicked_obj = $(this);
-
-                //Run Control method on the object
-                $.each(masterPanel, function(key, obj) {
-                    if (obj.type == id_type[0]) {
-                        obj.Click(clicked_obj);
-                    }                        
-                });
             });
         });
     

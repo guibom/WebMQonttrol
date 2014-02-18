@@ -6,8 +6,25 @@
 var paneliTunes = {
     //Default values
     type: "iTunes",
-    $panel: $("#Player_iTunes"),
     actionMessage: "home/player/itunes/",
+    $panel: $("#Player_iTunes"),
+    $itunesButtons: $(".WMQ_itunes.btn"),
+
+    //Constructor, run once at start
+    __begin__: function(){
+        
+        //Iterate over light buttons to get ID
+        this.$itunesButtons.map(function() {
+            //Set state and ID based on the id of the DOM element
+            $(this).data("action", getActionFromId($(this), paneliTunes.type));
+        });
+
+        //Bind click events
+        this.$itunesButtons.on("click", function(e) {
+            e.preventDefault();
+            paneliTunes.Control($(this));
+        });
+    },
     
     "home/player/itunes/status/playing": function() {
         if (msg.payload == '1') {                            
@@ -54,14 +71,12 @@ var paneliTunes = {
         }
     },
 
-    Click: function(controller) {
-        //Second part of MPC_xxx, lowercased is the MQTT message
-        var action = controller.attr("id").split("_");
-        action = action[1].toLowerCase();
-
+    Control: function($controller){
+        //Publish MQTT message
         socket.emit('publish', {
-            topic: this.actionMessage + action,
+            topic: topicComposer(paneliTunes.actionMessage, $controller.data("action")),
             message: '1'
         });
+
     }
 }

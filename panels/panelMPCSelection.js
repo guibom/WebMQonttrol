@@ -29,8 +29,7 @@ var panelMPCSelection = {
         $("#MPCSelection_ListFiles_2").on("click", function(e) {
             e.preventDefault();
             panelMPCSelection.OpenFolder("E:/MOVE/_WATCH");
-        });
-        
+        });        
     },
 
     "home/htpc/listfiles/result": function() {
