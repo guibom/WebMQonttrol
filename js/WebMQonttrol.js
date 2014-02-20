@@ -6,9 +6,13 @@
 var debug_show = false;  //If it's on, no panels will be hidden          
 var msg; //global msg variable       
 
-//Connect to socket and MQTT broker
-var socket = io.connect('http://192.168.0.175:3000');
+//Socket server and port
+var port = 3000;
+var host = (window.location.hostname) ? "http://" + window.location.hostname + ":" + port : "http://192.168.0.175:" + port
 
+
+//Connect to socket and MQTT broker
+var socket = io.connect(host);
 
 //Special tweaks for different page sizes
 function tweakPageForEnvironment(env) {
