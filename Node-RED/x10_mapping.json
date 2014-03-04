@@ -1,0 +1,56 @@
+{
+    "house": {
+        "A": {"hex": 0x6},                    
+        "B": {"hex": 0xE},
+        "C": {"hex": 0x2},
+        "D": {"hex": 0xA},
+        "E": {"hex": 0x1},
+        "F": {"hex": 0x9},
+        "G": {"hex": 0x5},
+        "H": {"hex": 0xD},
+        "I": {"hex": 0x7},
+        "J": {"hex": 0xF},
+        "K": {"hex": 0x3},
+        "L": {"hex": 0xB},
+        "M": {"hex": 0x0},
+        "N": {"hex": 0x8},
+        "O": {"hex": 0x4},
+        "P": {"hex": 0xC}
+        },
+
+    "unit": {
+        "UNIT_1": {"hex": 0xC},
+        "UNIT_2": {"hex": 0x1C},
+        "UNIT_3": {"hex": 0x4},
+        "UNIT_4": {"hex": 0x14},
+        "UNIT_5": {"hex": 0x2},
+        "UNIT_6": {"hex": 0x12},
+        "UNIT_7": {"hex": 0xA},
+        "UNIT_8": {"hex": 0x1A},
+        "UNIT_9": {"hex": 0xE},
+        "UNIT_10": {"hex": 0x1E},
+        "UNIT_11": {"hex": 0x6},
+        "UNIT_12": {"hex": 0x16},
+        "UNIT_13": {"hex": 0x0},
+        "UNIT_14": {"hex": 0x10},
+        "UNIT_15": {"hex": 0x8},
+        "UNIT_16": {"hex": 0x18}
+    },
+    "action": {
+        "ALL_UNITS_OFF": {"hex": 0x1},
+        "ALL_LIGHTS_ON": {"hex": 0x3},
+        "ON": {"hex": 0x5},
+        "OFF": {"hex": 0x7},
+        "DIM": {"hex": 0x9},
+        "BRIGHT": {"hex": 0xB},
+        "ALL_LIGHTS_OFF": {"hex": 0xD},
+        "EXTENDED_CODE": {"hex": 0xF},
+        "HAIL_REQUEST": {"hex": 0x11},
+        "HAIL_ACKNOWLEDGE": {"hex": 0x13},
+        "PRE_SET_DIM": {"hex": 0x15},
+        "EXTENDED_DATA": {"hex": 0x19},
+        "STATUS_ON": {"hex": 0x1B},
+        "STATUS_OFF": {"hex": 0x1D},
+        "STATUS_REQUEST": {"hex": 0x1F}
+    }
+}
