@@ -6,7 +6,7 @@
 var panelLight = {
     //Properties
     type: "Light",
-    controlMessage: "home/light/",
+    controlMessage: "home/light/%ID%/action",  //%ID% is replaced with Light ID
     $panel: $("#Controller_Light"),
     $lightButtons: $(".WMQ_light.btn"),
 
@@ -32,10 +32,10 @@ var panelLight = {
 
     "home/light/1/status": function() {
         if (msg.payload == 'on') {
-            this.LightON($('#Light_1'));
+            this.LightON($('#Light_1')); 
         } else {
-            this.LightOFF($('#Light_1'));
-        }
+            this.LightOFF($('#Light_1'));            
+        }        
     },
 
     "home/light/2/status": function() {
@@ -43,6 +43,14 @@ var panelLight = {
             this.LightON($('#Light_2'));
         } else {
             this.LightOFF($('#Light_2'));
+        }
+    },
+
+    "home/light/5/status": function() {
+        if (msg.payload == 'on') {
+            this.LightON($('#Light_5'));
+        } else {
+            this.LightOFF($('#Light_5'));
         }
     },
 
@@ -66,18 +74,17 @@ var panelLight = {
     //ON/OFF based Control messages
     LightControl: function($controller) {                
         //Toggle light status message
-        var send_msg;        
+        var send_msg;
         if ($controller.data("isOn")) {
-            send_msg = "off";           
+            send_msg = "off";
         } else {
             send_msg = "on";
         }
 
         //Publish MQTT message
         socket.emit('publish', {
-            topic: topicComposer(panelLight.controlMessage, $controller.data("id"), send_msg),
+            topic: topicComposer(panelLight.controlMessage.replace("%ID%", $controller.data("id")), send_msg),
             message: '1'
         });
     }
-
 }

@@ -49,8 +49,9 @@
             <!-- START Light Control Panel -->
                 <div class="tab-pane panel panel-default active Tab_Controller_Light Tab_Main" id="Controller_Light">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>                        
+                        <h3 class="panel-title"><span class="label label-default"><span class="glyphicon glyphicon-flash"></span> Light Control</span></h3>                       
                     </div>
+                    <!-- Light 1 -->
                     <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px">
                         <div class="row">
                             <div class="col-sm-4">
@@ -66,13 +67,23 @@
                             </div>
                         </div>                    
                     </div>
-
+                    <!-- Light 2 -->
                     <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px">
                         <div class="row">
                             <div class="col-sm-10" >
                                 <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">TV light</span></h2>
                             </div>
                             <div class="col-sm-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_2" class="btn btn-block btn-lg btn-danger WMQ_light" role="button" style="vertical-align:bottom;"><span class="glyphicon glyphicon-remove"></span> N/A</a>
+                            </div>
+                        </div>                    
+                    </div>
+                    <!-- Light 5 -->
+                    <div class="panel-body" style="padding-top: 0px; padding-bottom: 0px">
+                        <div class="row">
+                            <div class="col-sm-10" >
+                                <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left; padding: .2em .4em .3em;">Chair light</span></h2>
+                            </div>
+                            <div class="col-sm-2" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_5" class="btn btn-block btn-lg btn-danger WMQ_light" role="button" style="vertical-align:bottom;"><span class="glyphicon glyphicon-remove"></span> N/A</a>
                             </div>
                         </div>                    
                     </div>
@@ -257,6 +268,7 @@
             //Resize the page to match the proper size
             tweakPageForEnvironment(findBootstrapEnvironment());
 
+
             //Create web socket and start listening for MQTT messages
             socket.on('connect', function () {
                 socket.on('mqtt', function (lastmsg) {
@@ -277,7 +289,7 @@
 
                 //Topic subscriptions
                 socket.emit('subscribe', 
-                    {topic: 'home/light/1/status/#'}, 
+                    {topic: 'home/light/+/status/#'}, 
                     {topic: 'home/player/mpc'}, 
                     {topic: 'home/player/mpc/status/#'},
                     {topic: 'home/player/itunes'}, 
@@ -315,7 +327,7 @@
                 }
                 ,set: function(){                        
                     socket.emit('publish', {
-                        topic: 'home/light/1/set',
+                        topic: 'home/light/1/action/set',
                         message: new String($("#slider1").val())
                     });
                 }

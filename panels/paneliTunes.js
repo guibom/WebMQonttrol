@@ -37,7 +37,7 @@ var paneliTunes = {
     },
 
     "home/player/itunes": function() {
-        if (msg.payload == 'on') {                            
+        if (msg.payload == 'online') {                            
             $("#iTunes_OpenClose").html('<span class="glyphicon glyphicon-off"></span> Close'); 
             $("#iTunes_OpenClose").addClass('btn-warning').removeClass('btn-primary');
             //Show title text element

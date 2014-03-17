@@ -2,10 +2,14 @@
 Controller messages are set at start, and a will defined for unexpect disconnects. Gateways interface ethernet to RF/etc.
 Players get the information from EventGhost running on my HTPC
 ```
-home/gateway/MQTTRF			    (on, off) Retained
-home/gateway/MQTTRF/light/#	    (string) _ID of light_ Retained
+home/gateway/mqttrf			    (online, offline) Retained
+home/gateway/mqttrf/light/$ID	(online, offline) Retained
+home/gateway/mqttrf/x10         (online, offline) Retained
+home/gateway/mqttrf/rfswitch    (online, offline) Retained
+home/x10                        (online, offline) Retained
+home/rfswitch                   (online, offline) Retained
 
-home/player/mpc					(on, off) Retained		
+home/player/mpc					(on, off) Retained
 home/player/itunes				(on, off) Retained
 home/player/xbmc				(on, off) Retained
 
@@ -16,11 +20,11 @@ home/vault                      (on, off) Retained
 ### Action Messages
 Actions are received by other clients, and are usually just a trigger event
 ```
-home/light/$ID/on  				(1)
-home/light/$ID/off  			(1)
-home/light/$ID/fade_on			(int speed mili)
-home/light/$ID/fade_off			(int speed mili)
-home/light/$ID/set 				(0-100) _Brightness Value_
+home/light/$ID/action/on  			(1)
+home/light/$ID/action/off  			(1)
+home/light/$ID/action/fade_on		(int speed mili)
+home/light/$ID/action/fade_off		(int speed mili)
+home/light/$ID/action/set 			(0-100) _Brightness Value_
 
 home/player/mpc/playpause		(1)
 home/player/mpc/stop			(1)
@@ -37,6 +41,12 @@ home/player/itunes/volumedown   (1)
 home/htpc/sleep                 (1)
 home/htpc/wakeup                (1) WOL package from Node-Red
 home/htpc/listfiles             (string pathname)
+
+home/x10/A/UNIT_1/ON            (1) Processed by Node-RED
+    |__ home/X10/action         (JSON) {"H":0,"U":2,"A":99,"T":3}
+
+home/rfswitch/action            (JSON) {"D":123456,"B":24}
+
 ```
 
 ### Status Messages
