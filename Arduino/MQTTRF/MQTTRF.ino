@@ -12,6 +12,7 @@
 #include <JsonParser.h>
 #include <SPI.h>
 #include <Ethernet.h>
+#include <EthernetUdp.h>
 #include <PubSubClient.h>
 #include <VirtualWire.h>
 #include <x10.h>
@@ -36,6 +37,13 @@
   Metro memMetro = Metro(300000);
 #endif
 
+EthernetUDP Udp;
+unsigned int UDPPort = 666; // local port to listen on
+
+// buffers for receiving and sending data
+char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
+char ReplyBuffer[] = "1";       // a string to send back
+
 //315Mhz RF Switch
 RCSwitch mySwitch = RCSwitch();
 
@@ -43,14 +51,14 @@ RCSwitch mySwitch = RCSwitch();
 x10 myHouse =  x10(PIN_X10_ZERO_CROSS, PIN_X10_DATA);
 
 //X10 Json parser
-JsonParser<12> parser;
+JsonParser<8> parser;
 
 //Buffer for messages/progmem topics
 char buffer[64];
 
 #define TOPIC_ARRAY_SIZE 8
 char* topicElements[TOPIC_ARRAY_SIZE];
-char topicDelimiter[] = "/";
+const char topicDelimiter[] = "/";
 
 //Standard messages used
 #define STR_ON      "on"
@@ -72,24 +80,56 @@ const char STR_GATEWAY_RAM[] PROGMEM = "home/gateway/mqttrf/memory/free";
 const char STR_L1_STATUS[] PROGMEM = "home/light/1/status";
 const char STR_L1_BRIGHTNESS[] PROGMEM = "home/light/1/status/brightness";
 
-const char STR_X10_STATUS[] PROGMEM = "home/x10/status/raw";
+const char STR_X10_STATUS[] PROGMEM = "home/x10/status";
 const char STR_RFSWITCH_STATUS[] PROGMEM = "home/rfswitch/status/raw";
 
 //PROGMEM Subscription topics. Automatically subscribe to all of them at the start
 #define STR_TOPICS_SIZE 3  //Needs to reflect the actual number of topics needed
 prog_char P_STR_SUB_L_1[] PROGMEM = {"home/light/+/action/#"};
-prog_char P_STR_SUB_X10[] PROGMEM = {"home/x10/action"};
+prog_char P_STR_SUB_X10[] PROGMEM = {"home/x10/action/#"};
 prog_char P_STR_SUB_RFSWITCH[] PROGMEM = {"home/rfswitch/action"};
 
 //Holds all the subscriptions.
-PROGMEM const char *string_topics[] =
-{   
-  P_STR_SUB_L_1,
-  P_STR_SUB_X10,
-  P_STR_SUB_RFSWITCH
-};
+PROGMEM const char *string_topics[] = {P_STR_SUB_L_1, P_STR_SUB_X10, P_STR_SUB_RFSWITCH };
 
-// Update these with values suitable for your network.
+
+//House Codes Topics
+prog_char topic_house[] PROGMEM = {"ABCDEFGHIJKLMNOP"};
+//House Code Constants
+PROGMEM prog_uint8_t constant_house[] = {A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P};
+
+//Unit Code Constant
+PROGMEM prog_uint8_t constant_unit[] = {UNIT_1, UNIT_2, UNIT_3, UNIT_4, UNIT_5, UNIT_6, UNIT_7, UNIT_8, UNIT_9, UNIT_10, UNIT_11, UNIT_12, UNIT_13, UNIT_14, UNIT_15, UNIT_16};
+
+//Command Codes
+prog_char CMD_1[] PROGMEM = {"ALL_LIGHTS_ON"};
+prog_char CMD_2[] PROGMEM = {"ALL_UNITS_OFF"};
+prog_char CMD_3[] PROGMEM = {"ON"};
+prog_char CMD_4[] PROGMEM = {"OFF"};
+prog_char CMD_5[] PROGMEM = {"DIM"};
+prog_char CMD_6[] PROGMEM = {"BRIGHT"};
+prog_char CMD_7[] PROGMEM = {"ALL_LIGHTS_OFF"};
+prog_char CMD_8[] PROGMEM = {"EXTENDED_CODE"};
+prog_char CMD_9[] PROGMEM = {"HAIL_REQUEST"};
+prog_char CMD_10[] PROGMEM = {"HAIL_ACKNOWLEDGE"};
+prog_char CMD_11[] PROGMEM = {"PRE_SET_DIM"};
+prog_char CMD_12[] PROGMEM = {"EXTENDED_DATA"};
+prog_char CMD_13[] PROGMEM = {"STATUS_ON"};
+prog_char CMD_14[] PROGMEM = {"STATUS_OFF"};
+prog_char CMD_15[] PROGMEM = {"STATUS_REQUEST"};
+
+//Array of Command Codes
+PROGMEM const char *topic_command[] = {CMD_1,CMD_2,CMD_3,CMD_4,CMD_5,CMD_6,CMD_7,CMD_8,CMD_9,CMD_10,CMD_11,CMD_12,CMD_13,CMD_14,CMD_15};
+//Command Code constants
+PROGMEM prog_uint8_t constant_command[] = {ALL_LIGHTS_ON,ALL_UNITS_OFF,ON,OFF,DIM,BRIGHT,ALL_LIGHTS_OFF,EXTENDED_CODE,HAIL_REQUEST,HAIL_ACKNOWLEDGE,PRE_SET_DIM,EXTENDED_DATA,STATUS_ON,STATUS_OFF,STATUS_REQUEST};
+
+//The section in the MQTT topic array that the specific X10 codes are
+#define X10_HOUSE_N   3
+#define X10_UNIT_N    X10_HOUSE_N + 1
+#define X10_CMD_N     X10_UNIT_N + 1
+
+
+//Hardcoded network address
 byte mac[]    = { 0x00, 0x00, 0x10, 0x66, 0x66, 0x66 };
 byte server[] = { 192, 168, 0, 175 };
 byte ip[]     = { 192, 168, 0, 20 };
@@ -117,7 +157,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   #endif
 
 
-  //Light 1 ACTIONS
+  //Light 1 ACTIONS **************************************************
   if (strncmp(topic,"home/light/1/action/", 20)==0) {
 
     byte lightId, lightCmd, lightMax, lightVal;
@@ -127,7 +167,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
     //Split topic elements
     strcpy(buffer, topic);
     fillTopicElements();
-
 
     //ON    
     if (strcmp(topicElements[4], "on")==0) {
@@ -196,38 +235,77 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
   }
 
-  //X10 ACTIONS
-  if (strncmp(topic,"home/x10/action", 15)==0) {
 
-    //Copy payload first    
-    char JsonACK[strlen(cpayload)+1];    
-    strcpy (JsonACK,cpayload);
+  //X10 ACTIONS ******************************************************
+  if (strncmp(topic,"home/x10/action/", 16)==0) {
 
-    //Parse JSON payload -- Format {"H":0,"U":2,"A":99,"T":3}
-    JsonHashTable hashTable = parser.parseHashTable(cpayload);
+    //Split topic elements
+    strcpy(buffer, topic);
+    fillTopicElements();
 
-    //Failed (bigger then buffer?)
-    if (!hashTable.success()) {
-      #if DEBUG                
-        Serial << "JSON Parser failed!" << endl;
-      #endif
-      return;
+    //Loop over all HOUSES
+    for (uint8_t h = 0; h < 17; h++) {
+
+      //Copy house codes from PROGMEM
+      char b_topic_house[2] = {pgm_read_byte(topic_house + h)};
+      byte b_constant_house = pgm_read_byte_near(constant_house + h);
+
+      //Check house code match
+      if (strcmp(topicElements[X10_HOUSE_N], b_topic_house)==0) {
+
+        //Loop over all UNITS
+        for (int u = 0; u < 16; u++) {
+
+          //Create a UNIT_XX string based on the loop number
+          char b_topic_unit[8] = "UNIT_";
+          char b_topic_unit_numb[3];
+          itoa(u + 1, b_topic_unit_numb, 10);
+          strncat (b_topic_unit, b_topic_unit_numb, 2);
+
+          //Copy unit codes from PROGMEM
+          byte b_constant_unit = pgm_read_byte_near(constant_unit + u);
+          
+          //Check unit code match
+          if (strcmp(topicElements[X10_UNIT_N], b_topic_unit)==0) {            
+
+            //Loop over all HOUSES
+            for (uint8_t c = 0; c < 16; c++) {
+
+              //Copy command codes from PROGMEM              
+              strcpy_P(buffer, (char*)pgm_read_word(&(topic_command[c])));    
+              byte b_constant_command = pgm_read_byte_near(constant_command + c);              
+
+              //Check command for match
+              if (strcmp(topicElements[X10_CMD_N], buffer)==0) {          
+
+                //Payload is the number of tries
+                int bvalue = atoi(cpayload);     
+
+                #if DEBUG                
+                  Serial << "X10 Action: " << b_topic_house << ":" << b_constant_house << "/" << b_topic_unit << ":" << b_constant_unit << "/" << buffer << ":" << b_constant_command << " -- Try: " << bvalue << endl;
+                #endif               
+
+                //Execute X10 Command
+                myHouse.write(b_constant_house, b_constant_unit, bvalue);
+                myHouse.write(b_constant_house, b_constant_command, bvalue);
+                
+                //Acknowledge X10 status by publishing the received topic in a status message
+                char X10ACK[26]; 
+                sprintf(X10ACK, "%s", topic + 16);
+                Publish(STR_X10_STATUS, X10ACK, false);
+
+                //Stop checking
+                return;
+              }
+            }
+          }
+        }       
+      }
     }
-
-    //Parsed JSON OK!
-    #if DEBUG                
-      Serial << "X10 Action: " << hashTable.getLong("H") << " " << hashTable.getLong("U") << " " << hashTable.getLong("A") << " " << hashTable.getLong("T") << endl;
-    #endif
-
-    //Execute X10 Command
-    myHouse.write(hashTable.getLong("H"), hashTable.getLong("U"), hashTable.getLong("T"));
-    myHouse.write(hashTable.getLong("H"), hashTable.getLong("A"), hashTable.getLong("T"));
-     
-    //Acknowledge X10 status by publishing the same message 
-    Publish(STR_X10_STATUS, JsonACK, false);
   }
 
-  //315 RF Switch ACTIONS
+
+  //315 RF Switch ACTIONS ********************************************
   if (strncmp(topic,"home/rfswitch/action", 20)==0) {
 
     //Copy payload first    
@@ -248,7 +326,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     //Send RFSwitch command
     mySwitch.send(hashTable.getLong("D"), hashTable.getLong("B"));
     //mySwitch.send(1393741, 24);
-    // mySwitch.send(1393777, 24);
+    //mySwitch.send(1393777, 24);
 
     //Parsed JSON OK!
     #if DEBUG                
@@ -257,7 +335,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     //Acknowledge RFSwitch command by publishing the same message 
     Publish(STR_RFSWITCH_STATUS, JsonACK, false);
-  } 
+  }
+
 }
 
 //Fill array with split topic elements
@@ -318,6 +397,12 @@ void setup() {
     Serial.println("Connected to Ethernet");
   #endif
 
+  //Start UPD daemon
+  Udp.begin(UDPPort);
+
+  #if DEBUG    
+    Serial.println("Opened UDP Port");
+  #endif
 
   //Try to connect to MQTT server
   if (client.connect("MQTTRF", getString(STR_GATEWAY), 0, 1, STR_OFFLINE)) {
@@ -326,7 +411,7 @@ void setup() {
         Serial.println("Connected to MQTT broker");
     #endif
 
-    //Publish gateway abilities and conencted hardware    
+    //Publish gateway abilities and conencted hardware
     Publish(STR_GATEWAY, STR_ONLINE, true);
     Publish(STR_GATEWAY_L1, STR_ONLINE, true);
     Publish(STR_GATEWAY_X10, STR_ONLINE, true);
@@ -375,8 +460,12 @@ void setup() {
 
 //Default loop, just process MQTT messages & Metro actions
 void loop() {
-  
+
+  //MQTT loop  
   client.loop();
+
+  //UDP admin loop
+  checkUDP();
 
   #if PUBLISH_MEM
     // check if the metro has passed its interval
@@ -428,6 +517,42 @@ boolean Publish_FreeMem() {
   sprintf(mem, "%d", freeMemory());  
 
   return client.publish(getString(STR_GATEWAY_RAM), (uint8_t*)mem, strlen(mem), true);
+}
+
+//Check Magic packet in UDP, soft reset if kill command found
+void checkUDP() {
+
+  // if there's data available, read a packet
+  int packetSize = Udp.parsePacket();
+  
+  if(packetSize) {    
+    char contents = Udp.read();    
+    // send a reply, to the IP address and port that sent us the packet we received
+    Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+    
+    if (contents == 'K') {
+
+      Udp.write('1');      
+      Udp.endPacket();
+
+      #if DEBUG            
+        Serial << "RESETTING..." << endl;
+      #endif
+      
+      //Software Reset
+      software_Reset();
+
+    } else {
+
+      Udp.write('0');
+      Udp.endPacket();
+    }        
+  }
+}
+
+// Restarts program from beginning but does not reset the peripherals and registers
+void software_Reset() {
+  asm volatile ("  jmp 0");
 }
 
 //Return size of PROGMEM variable
