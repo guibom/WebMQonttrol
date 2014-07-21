@@ -28,7 +28,7 @@ var panelMPC = {
     },
 
     "home/player/mpc": function() {                    
-        if (msg.payload == 'on' || debug_show) {                        
+        if (msg.payload == 'online' || debug_show) {                        
             showPanel(this.$panel);
         } else {                    
             hidePanel(this.$panel);

@@ -73,7 +73,19 @@ function topicComposer(arg){
 
 //Return the Action message from DOM id in the format <Type>_<Action>
 function getActionFromId($obj, panel_type){
-    return $obj.attr('id').split(panel_type + "_").pop();    
+
+    return $obj.attr('id').split(panel_type + "_").pop();
+}
+
+//Return the Action message from DOM id in the format <Type>_<ID>_<Action>
+function getActionFromId($obj){
+    
+    return $obj.attr('id').split("_").pop();
+}
+
+function getNameFromId($obj) {
+
+    return $obj.attr('id').split("_").splice(-2, 1).pop();
 }
 
 //Assign hide class
