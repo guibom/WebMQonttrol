@@ -19,8 +19,7 @@ var mqttport = 1883;
 var io = socket.listen(3000);
 var mqttclient = mqtt.createClient(mqttport, mqttbroker);
 
-// Reduce socket.io debug output
-io.set('log level', 0);
+//Internal debug
 var debug_messages = false;
 
 //Console commands
@@ -41,7 +40,7 @@ io.sockets.on('connection', function (socket) {
     DEBUG_LOG('Client Connected: ' + socket.id);
 
     //Subscribe to an arbitrary number of topics
-    socket.on('subscribe', function (data) {        
+    socket.on('subscribe', function (data) {
 
         //Subscribe to all the messages passed as arguments
         for (var i = 0; i < arguments.length; i++) {
@@ -85,8 +84,7 @@ io.sockets.on('connection', function (socket) {
         }
         catch(err) {
             DEBUG_LOG('ERROR: ' + err, true);            
-        }
-        
+        } 
     });
 
     //Unsubscribe from topic
@@ -106,7 +104,6 @@ mqttclient.on('message', function(topic, payload) {
     //Log MQTT messages being received
     DEBUG_LOG('RECEIVED: ' + topic + " " + payload);
 });
-
 
 //Print debug message to log, if server in debug mode
 function DEBUG_LOG(msg, force)

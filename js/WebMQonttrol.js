@@ -10,7 +10,6 @@ var msg; //global msg variable
 var port = 3000;
 var host = (window.location.hostname) ? "http://" + window.location.hostname + ":" + port : "http://192.168.0.175:" + port
 
-
 //Connect to socket and MQTT broker
 var socket = io.connect(host);
 
