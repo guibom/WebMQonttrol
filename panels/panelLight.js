@@ -81,6 +81,14 @@ var panelLight = {
         }
     },
 
+    "home/light/7/status": function() {
+        if (msg.payload == 'on') {
+            this.LightON($('#Light_7'));
+        } else {
+            this.LightOFF($('#Light_7'));
+        }
+    },
+
     LightON: function($controller) {
         $controller.html('<span class="glyphicon glyphicon-ok"></span> ON');                        
         $controller.removeClass('btn-default').removeClass('btn-danger').addClass('btn-success');
