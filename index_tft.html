@@ -1,0 +1,179 @@
+<!-- Copyright (c) 2014, Guilherme Ramos <longinus@gmail.com> -->
+<!-- https://github.com/guibom/WebMQonttrol -->
+<!-- Released under the MIT license. See LICENSE file for details. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <title>Home Control</title>
+
+    <!-- Bootstrap and Bootstrap-Slider CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/weather-icons.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/jquery.nouislider.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container">
+
+
+    <div class="row">
+        <div class="col-xs-7">
+            <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left;">Sofa light</span></h2>
+        </div>
+        <div class="col-xs-5" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_1" class="btn btn-block btn-lg btn-danger WMQ_light" role="button" style="vertical-align:bottom; "><span class="glyphicon glyphicon-remove"></span>N/A</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-7">
+            <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left;">TV light</span></h2>
+        </div>
+        <div class="col-xs-5" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_2" class="btn btn-block btn-lg btn-danger WMQ_light" role="button" style="vertical-align:bottom;"><span class="glyphicon glyphicon-remove"></span>N/A</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-7">
+            <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left;">Recliner light</span></h2>
+        </div>
+        <div class="col-xs-5" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_3" class="btn btn-block btn-lg btn-danger WMQ_light" role="button" style="vertical-align:bottom;"><span class="glyphicon glyphicon-remove"></span>N/A</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-7">
+            <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left;">Living room</span></h2>
+        </div>
+        <div class="col-xs-5" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_4" class="btn btn-block btn-lg btn-danger WMQ_light" role="button" style="vertical-align:bottom;"><span class="glyphicon glyphicon-remove"></span>N/A</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-7">
+            <h2><span class="label label-info" style="vertical-align:top; display: block; text-align:left;">Chair Light</span></h2>
+        </div>
+        <div class="col-xs-5" style="text-align:right; vertical-align:center; padding-top: 14px; "><a href="#" id="Light_7" class="btn btn-block btn-lg btn-danger WMQ_light" role="button" style="vertical-align:bottom;"><span class="glyphicon glyphicon-remove"></span>N/A</a>
+        </div>
+    </div>
+  
+                
+    <!-- END Light Control Panel -->            
+
+    </div>
+        <!-- TAB PANE END -->                        
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <!-- socket.io for communication -->
+    <script type="text/javascript" src="js/socket.io.min.js"></script>
+
+    <!-- .noUIslider Slider -->
+    <script src="js/jquery.nouislider.min.js"></script>
+    <script src="js/tab.js"></script>
+    <script src="js/modernizr.js"></script>
+
+    <!-- Utility Functions -->
+    <script src="js/WebMQonttrol.js"></script>
+
+    <!-- Individual Panel scripts -->
+    <script src="panels/panelLight.js"></script>
+    <script src="panels/panelMPC.js"></script>
+    <script src="panels/paneliTunes.js"></script>
+    <script src="panels/panelMPCSelection.js"></script>    
+    <!-- <script src="panels/panelSensors.js"></script>  -->
+
+    <!-- Main Script -->
+    <script>
+
+        $(function() {                       
+
+            //Objects that hold the topic subscriptions and other values for that panel
+            var masterPanel = [panelMPC, panelLight, paneliTunes, panelMPCSelection];
+
+            //Start sudo-constructor on each panel object that has one
+            //Do it before starting the web socket
+            $.each(masterPanel, function(key, obj) {
+                if (typeof obj.__begin__ === 'function')
+                    obj.__begin__();            
+            });
+
+            //Resize the page to match the proper size
+            tweakPageForEnvironment(findBootstrapEnvironment());
+
+
+            //Create web socket and start listening for MQTT messages
+            socket.on('connect', function () {
+                socket.on('mqtt', function (lastmsg) {
+
+                    //Save lastmsg
+                    msg = lastmsg;
+
+                    //Forward topic to the right object
+                    $.each(masterPanel, function(key, obj) {
+                        if (obj[msg.topic])        
+                            obj[msg.topic]();                   
+                    });
+                   
+                    //Preview of MQTT message
+                    $('#message').html(msg.topic + ', ' + msg.payload.substring(0, 100));
+                  
+                });
+
+                //Topic subscriptions
+                socket.emit('subscribe', 
+                    {topic: 'home/light/+/status/#'}, 
+                    {topic: 'home/player/mpc'}, 
+                    {topic: 'home/player/mpc/status/#'},
+                    {topic: 'home/player/itunes'}, 
+                    {topic: 'home/player/itunes/status/#'},
+                    {topic: 'home/web/config/#'},
+                    {topic: 'home/htpc/#'}
+                    );
+            });
+
+            //Check if we have a valid websocket connection
+            socket.on('error', function () {
+                logError("Could not connect to the web socket server!");                
+            })
+
+            //Show/Hide the panels depending if they have a class with the same ID as the tab
+            $('.tab_control').click(function (e) {
+                e.preventDefault();
+
+                $(this).tab('show');
+                var currentId = "." + $(this).attr('id');
+
+                $(".tab-pane").removeClass("active");
+                $(currentId).addClass("active");
+            })
+      
+
+            //noUiSlider Events
+            $('.noUiSlider').noUiSlider({
+                range: [0, 100]
+                ,start: 0
+                ,step: 1
+                ,handles: 1     
+                ,serialization: {
+                    resolution: 1
+                }
+                ,set: function(){                        
+                    socket.emit('publish', {
+                        topic: 'home/light/1/action/set',
+                        message: new String($("#slider1").val())
+                    });
+                }
+                ,slide: function(){
+                    $('#Light_1_Brightness').text($("#slider1").val());
+                }
+            });
+        });
+    
+    </script>
+</body>
+</html>
