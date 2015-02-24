@@ -3,13 +3,13 @@ WebMQonttrol
 
 Web interface and server to pub/sub MQTT messages for home automation, using Node.js and Socket.io. The `index.html` page uses a web socket to connect to the listening server `WebMQonttrol_server.js` with node.js. The server creates a connection to the MQTT broker, and passes messages from/to the client-page connected.
 
-![alt text](https://raw2.github.com/guibom/WebMQonttrol/master/docs/screenshot.png "Screenshot")
+![alt text](https://raw.githubusercontent.com/guibom/WebMQonttrol/master/docs/screenshot.png "Screenshot")
 
 ###Structure overview
 
 The structure and layout are very specific to my use case, and definitly won't work out of the box for other people. But hopefully this can serve as a starting point for your project. The MQTT messages I'm using are under the /docs folder. The main idea is to have actions and status messages. Actions are mostly trigger topic, where the actual message is not really important (though can be used as a 'function argument'). Status messages are usually set by whoever receiver the action message, and the messages the webpage uses to show the current status.
 
-![alt text](https://raw2.github.com/guibom/WebMQonttrol/master/docs/WebMQonttrol_Structure.png "Structure overview")
+![alt text](https://raw.githubusercontent.com/guibom/WebMQonttrol/master/docs/WebMQonttrol_Structure.png "Structure overview")
 
 ###Dependencies
 - [node.js](http://www.nodejs.org/) - Used to run a socket.io server `WebMQonttrol_server.js`, that the `index.html` page connects to.
