@@ -9,15 +9,12 @@
  * Copyright (c) 2013, Fabian Affolter <fabian@affolter-engineering.ch>
  * Released under the MIT license. See LICENSE file for details.
  */
-
 var mqtt = require('mqtt');
-var socket = require('socket.io');
-
 var mqttbroker = 'localhost:1883';
-
-var io = socket.listen(3000);
-var mqttclient = mqtt.createClient(mqttport, mqttbroker);
 var mqttclient = mqtt.connect('mqtt://' + mqttbroker);
+
+var socket = require('socket.io');
+var io = socket.listen(3000);
 
 //Internal debug
 var debug_messages = false;
