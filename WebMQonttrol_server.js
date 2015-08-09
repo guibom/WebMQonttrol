@@ -98,7 +98,7 @@ io.sockets.on('connection', function (socket) {
 mqttclient.on('message', function(topic, payload) {
     io.sockets.emit('mqtt',
         {'topic'  : topic,
-         'payload' : payload
+         'payload' : String(payload)
         }
     );
 
