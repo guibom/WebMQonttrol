@@ -13,25 +13,29 @@
 var mqtt = require('mqtt');
 var socket = require('socket.io');
 
-var mqttbroker = 'localhost';
-var mqttport = 1883;
+var mqttbroker = 'localhost:1883';
 
 var io = socket.listen(3000);
 var mqttclient = mqtt.createClient(mqttport, mqttbroker);
+var mqttclient = mqtt.connect('mqtt://' + mqttbroker);
 
 //Internal debug
 var debug_messages = false;
 
 //Console commands
-process.argv.forEach(function (val, index, array) {  
+process.argv.forEach(function (val, index, array) {
     if (val) {
         if (val.toLowerCase() == "debug") {
             debug_messages = true;
         }
-    }  
+    }
 });
 
-DEBUG_LOG('Server Started!');
+//Connect to Broker
+mqttclient.on('connect', function() {
+  DEBUG_LOG('Server Started!');
+});
+
 
 // Subscribe to topic
 io.sockets.on('connection', function (socket) {
@@ -44,7 +48,7 @@ io.sockets.on('connection', function (socket) {
 
         //Subscribe to all the messages passed as arguments
         for (var i = 0; i < arguments.length; i++) {
-            
+
             try {
 
                 //Check topic for errors
@@ -54,14 +58,14 @@ io.sockets.on('connection', function (socket) {
                     return false;
                 }
 
-                //Topic is not null, subscribe         
+                //Topic is not null, subscribe
                 mqttclient.subscribe(arguments[i].topic);
                 //Log subscriptions to console
                 DEBUG_LOG('SUB: ' + arguments[i].topic);
             }
             catch(err) {
-                DEBUG_LOG('ERROR: ' + err, true);            
-            }            
+                DEBUG_LOG('ERROR: ' + err, true);
+            }
         }
     });
 
@@ -80,11 +84,11 @@ io.sockets.on('connection', function (socket) {
 
         //Publish MQTT message
         try {
-            mqttclient.publish(data.topic, data.message);    
+            mqttclient.publish(data.topic, data.message);
         }
         catch(err) {
-            DEBUG_LOG('ERROR: ' + err, true);            
-        } 
+            DEBUG_LOG('ERROR: ' + err, true);
+        }
     });
 
     //Unsubscribe from topic
